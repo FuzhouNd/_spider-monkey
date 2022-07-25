@@ -2,9 +2,13 @@ import express from 'express';
 import fs from 'fs-extra';
 import path from 'path';
 import cors from 'cors';
+import expressWs from 'express-ws';
 
-const app = express();
-app.use(cors());
+const appBase = express();
+appBase.use(cors());
+const { app, getWss } = expressWs(appBase);
+
+type Payload = { action: string[]; params: any };
 
 // parse application/json
 app.use(express.json({ limit: '10mb' }));
@@ -64,6 +68,25 @@ app.post('/get', async (req, res) => {
   }
   res.send('');
 });
+
+type Send = (data: Payload | Payload[]) => Promise<any>;
+let _callBack = (send: Send) => {};
+
+app.ws('/exec', function (ws, req) {
+  function send(data: any) {
+    return new Promise((resolve) => {
+      ws.send(JSON.stringify(data));
+      ws.on('message', (msg: string) => {
+        resolve(JSON.parse(msg));
+      });
+    });
+  }
+  _callBack(send);
+});
+
+export function useCallBack(cb: (send: Send) => {}) {
+  _callBack = cb;
+}
 
 app.listen(8998);
 console.log('服务在8998端口');
