@@ -1,24 +1,29 @@
-import { path } from 'ramda';
 export type Payload = {
-  action: string[];
+  action: string;
   params: any[];
 };
 
-type Re = { data: any };
-async function exec(payloadList: Payload[]): Promise<Re> {
-  // 上下文
-  let context: any = window;
+type ActionMap = {
+  [key: string]: (context: unknown, ...params: unknown[]) => unknown;
+};
+
+const modules = import.meta.glob('./action/*.ts', { eager: true });
+
+const actionMap = Object.keys(modules).reduce((re, key) => {
+  const _module = modules[key] as { [key: string]: (args: unknown) => unknown };
+  return { ...re, ..._module };
+}, {} as ActionMap);
+console.log(actionMap, 'actionMap');
+
+async function exec(payloadList: Payload[]) {
+  let t: any = void 0;
   for (const payload of payloadList) {
     const { action, params } = payload;
-    const _context = path(action, context);
-    console.log(_context, params);
-    if (typeof _context === 'function') {
-      context = await _context(...params);
-    } else {
-      context = _context;
+    if (actionMap[action]) {
+      t = await actionMap[action](t, ...params);
     }
   }
-  return { data: context };
+  return { data: t };
 }
 
 export { exec };

@@ -8,7 +8,7 @@ const appBase = express();
 appBase.use(cors());
 const { app, getWss } = expressWs(appBase);
 
-type Payload = { action: string[]; params: any };
+type Payload = { action: string; params: any };
 
 // parse application/json
 app.use(express.json({ limit: '10mb' }));
