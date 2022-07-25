@@ -5,7 +5,8 @@ import fs from 'fs-extra';
 
 
 export async function toText(filePath:string) {
-  let dataBuffer = fs.readFileSync('./1.pdf');
+  //@ts-ignore
+  let dataBuffer = fs.readFileSync(filePath);
   const data = await pdf(dataBuffer)
   return data.text
 }

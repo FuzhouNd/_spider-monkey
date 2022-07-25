@@ -10,3 +10,10 @@ export function delay(n = 6 * 1000) {
     }, n);
   });
 }
+
+export function deleteSemi(params:string) {
+  return params.replace(/[;]/g, '；')
+}
+export function deleteRF(params:string) {
+  return params.replace(/[\s]/g, ' ')
+}
