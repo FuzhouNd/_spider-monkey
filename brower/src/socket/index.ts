@@ -1,7 +1,7 @@
 import { exec } from '@/executor/index';
 
 // @ts-ignore
-const socket = window.__socket || new WebSocket('ws://127.0.0.1:8998/exec');
+const socket:WebSocket = window.__socket || new WebSocket('ws://127.0.0.1:8998/exec');
 
 // Connection opened
 // socket.addEventListener('open', function () {

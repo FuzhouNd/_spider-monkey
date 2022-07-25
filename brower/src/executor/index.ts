@@ -13,7 +13,6 @@ const actionMap = Object.keys(modules).reduce((re, key) => {
   const _module = modules[key] as { [key: string]: (args: unknown) => unknown };
   return { ...re, ..._module };
 }, {} as ActionMap);
-console.log(actionMap, 'actionMap');
 
 async function exec(payloadList: Payload[]) {
   let t: any = void 0;

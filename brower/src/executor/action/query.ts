@@ -1,4 +1,7 @@
-export function querySelector(dom = document, selector: string) {
+export function querySelector(dom:HTMLElement | HTMLElement[], selector: string) {
+  if(Array.isArray(dom)){
+    return dom.map(d => d.querySelector(selector))
+  }
   return dom.querySelector(selector);
 }
 
