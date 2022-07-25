@@ -3,7 +3,7 @@ import { useCallBack } from '@/server/index';
 
 useCallBack(async (send) => {
   const data = await send([
-    { action: 'querySelector', params: ['div'] },
+    { action: 'querySelectorAll', params: ['div a'] },
     { action: 'textContent', params: [] },
   ]);
   console.log(data);
