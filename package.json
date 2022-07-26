@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "server":"pnpm esno ./src/server/index.ts"
+    "server": "pnpm esno ./src/server/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +21,7 @@
     "@types/ramda": "^0.28.15",
     "@types/yargs": "^17.0.10",
     "cors": "^2.8.5",
+    "dayjs": "^1.11.4",
     "download": "^8.0.0",
     "esno": "^0.16.3",
     "express": "^4.18.1",
@@ -30,8 +31,10 @@
     "jsdom": "^20.0.0",
     "node-fetch": "^3.2.9",
     "pdf-parse": "^1.1.1",
+    "pdfjs": "^2.4.7",
+    "puppeteer-core": "^15.5.0",
     "ramda": "^0.28.0",
-    "yargs": "^17.5.1",
-    "rollup": "^2.77.0"
+    "rollup": "^2.77.0",
+    "yargs": "^17.5.1"
   }
 }

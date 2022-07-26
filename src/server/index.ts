@@ -3,6 +3,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import cors from 'cors';
 import expressWs from 'express-ws';
+import dayjs from 'dayjs';
 
 const appBase = express();
 appBase.use(cors());
@@ -31,6 +32,7 @@ app.post('/set', async (req, res) => {
           return file.data[key];
         })
         .join(',');
+      console.log('write', dayjs().format('YYYY-MM-DD HH:mm:ss'), filePath);
       fs.writeFileSync(filePath, str, { flag: 'a' });
     });
   }
@@ -52,6 +54,7 @@ app.post('/set', async (req, res) => {
         return file.data[key];
       })
       .join(';');
+    console.log('write', dayjs().format('YYYY-MM-DD HH:mm:ss'), filePath);
     fs.writeFileSync(filePath, str + '\r\n', { flag: 'a' });
   }
   res.send('');
