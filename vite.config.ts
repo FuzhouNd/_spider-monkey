@@ -6,7 +6,7 @@ export default defineConfig({
   // ...
   build: {
     lib: {
-      entry: './src/index.ts',
+      entry: './src/browser/index.ts',
       name: '__socket',
       formats: ['iife', 'umd'],
     },

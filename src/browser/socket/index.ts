@@ -1,4 +1,4 @@
-import { exec } from '@/executor/index';
+import { exec } from '@/browser/executor/index';
 
 // @ts-ignore
 const socket:WebSocket = window.__socket || new WebSocket('ws://127.0.0.1:8998/exec');

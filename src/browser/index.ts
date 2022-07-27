@@ -1,4 +1,4 @@
-import { socket as __socket } from '@/socket/index';
+import { socket as __socket } from '@/browser/socket/index';
 export default __socket;
 // function queryAll(selector = '') {
 //   return [...document.querySelectorAll(selector)];
