@@ -29,13 +29,17 @@ import { toPdf } from '@/pdf';
   const page = await brow.newPage();
   for (const url of urlList) {
     const id = url.split('/')[2].split('-')[0];
-    if (fs.pathExistsSync(`./data/pdf/${id}.pdf`)) {
+    if (fs.pathExistsSync(`./data/pdf/${id}.html`)) {
       console.log(id, 'jump');
       continue;
     }
     await page.goto('https://seekingalpha.com' + url);
     await page.waitForTimeout(2000);
     await page.$$eval('svg', (l) => l.forEach((d) => d.remove()));
+    await page.$$eval('blockquote', (l) => l.forEach((d) => d.remove()));
+    await page.$$eval('[data-test-id="author-brief"]', (l) => l.forEach((d) => d.remove()));
+    await page.$$eval('[data-test-id="themes-list"]', (l) => l.forEach((d) => d.remove()));
+    await page.$$eval('[type="button"]', (l) => l.forEach((d) => d.remove()));
     const dom = await page.$('[data-test-id="card-container"]');
     if (dom) {
       const html = await dom.evaluate((node) => node.innerHTML);
