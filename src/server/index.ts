@@ -15,8 +15,6 @@ const { app } = expressWs(appBase);
 // parse application/json
 app.use(express.json({ limit: '10mb' }));
 
-
-
 const eventEmit = new EventEmitter();
 app.ws('/exec', function (ws, req) {
   ws.on('message', (msg: string) => {
@@ -25,10 +23,31 @@ app.ws('/exec', function (ws, req) {
     // console.log(msg);
     function send(message: PayloadMessage): Promise<Message> {
       return new Promise((resolve) => {
-        const _ws = ws as unknown as WebSocket
+        const _ws = ws as unknown as WebSocket;
+        // 把入参处理下
+        if (Array.isArray(message.data)) {
+          message.data = message.data.map((item) => {
+            return {
+              ...item,
+              params: item.params.map((p) => {
+                if (typeof p === 'function') {
+                  return p.toString();
+                }
+                return p;
+              }),
+            };
+          });
+        } else {
+          message.data.params = message.data.params.map((p) => {
+            if (typeof p === 'function') {
+              return p.toString();
+            }
+            return p;
+          })
+        }
         _ws.send(JSON.stringify(message));
         const li = (evt: MessageEvent<string>) => {
-          const data = JSON.parse(evt.data) as Message
+          const data = JSON.parse(evt.data) as Message;
           if (data.id === message.id) {
             resolve(data);
             _ws.removeEventListener('message', li);
@@ -41,9 +60,7 @@ app.ws('/exec', function (ws, req) {
   });
 });
 
-export function useCallBack(
-  cb: ({ send, message }: { send: (message: Message) => Promise<Message>; message: Message }) => {}
-) {
+export function useCallBack(cb: ({ send, message }: { send: (message: Message) => Promise<Message>; message: Message }) => {}) {
   eventEmit.addListener('message', cb);
 }
 

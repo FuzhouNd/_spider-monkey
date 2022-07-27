@@ -1,6 +1,6 @@
 import { exec } from '@/browser/executor/index';
 import { MESSAGE_TYPE } from '@/browser/enum';
-import { type Message } from './type';
+import type {  Message } from './type';
 import { Payload } from '@/browser/executor/type';
 
 const VITE_EXPORT_NAME = import.meta.env.VITE_EXPORT_NAME;

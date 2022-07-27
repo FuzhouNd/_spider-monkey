@@ -33,9 +33,10 @@ export async function map(t: any, funcStr = '') {
   return re;
 }
 
-export async function _eval(t: any, funcStr: string) {
+async function _eval(t: any, funcStr: string) {
   const func = await getFunc(funcStr, 'eval');
   const re = await func();
   func.destroy()
   return re
 }
+export {_eval as eval}

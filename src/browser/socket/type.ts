@@ -1,5 +1,5 @@
 import { MESSAGE_TYPE } from '@/browser/enum';
-import { type Payload } from '@/browser/executor/type';
+import type { Payload } from '@/browser/executor/type';
 
 type Content = { url: string };
 
