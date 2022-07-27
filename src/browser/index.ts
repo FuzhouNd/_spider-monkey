@@ -1,5 +1,8 @@
-import { socket as __socket } from '@/browser/socket/index';
-export default __socket;
+import { initSocket } from '@/browser/socket/index';
+initSocket()
+export default {
+  version: '0.0.1',
+};
 // function queryAll(selector = '') {
 //   return [...document.querySelectorAll(selector)];
 // }

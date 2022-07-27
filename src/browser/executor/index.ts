@@ -1,11 +1,4 @@
-export type Payload = {
-  action: string;
-  params: any[];
-};
-
-type ActionMap = {
-  [key: string]: (context: unknown, ...params: unknown[]) => unknown;
-};
+import { ActionMap, Payload } from './type';
 
 const modules = import.meta.glob('./action/*.ts', { eager: true });
 
@@ -14,8 +7,11 @@ const actionMap = Object.keys(modules).reduce((re, key) => {
   return { ...re, ..._module };
 }, {} as ActionMap);
 
-async function exec(payloadList: Payload[]) {
+async function exec(payloadList: Payload[]|Payload) {
   let t: any = void 0;
+  if(!Array.isArray(payloadList)){
+    payloadList = [payloadList]
+  }
   for (const payload of payloadList) {
     const { action, params } = payload;
     if (actionMap[action]) {
