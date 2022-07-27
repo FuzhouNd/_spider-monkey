@@ -11,10 +11,18 @@ useCallBack(async ({ send, message }) => {
     const data = await send({
       type: MESSAGE_TYPE.payload,
       data: [
-        { action: ACTION.querySelector, params: ['#sb_form_q'] },
-        { action: ACTION.input, params: ['你好'] },
-        { action: ACTION.querySelector, params: ['#sb_form_go'] },
-        { action: 'click', params: [] },
+        // { action: ACTION.querySelector, params: ['#sb_form_q'] },
+        // { action: ACTION.input, params: ['你好'] },
+        // { action: ACTION.querySelector, params: ['#sb_form_go'] },
+        // { action: 'click', params: [] },
+        {
+          action: '_eval',
+          params: [
+           () => {
+              return [...document.querySelectorAll('a')].map((d) => d.textContent);
+            },
+          ],
+        },
       ],
       id: new Date().valueOf().toString(),
     });
