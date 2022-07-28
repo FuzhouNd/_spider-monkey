@@ -26,5 +26,13 @@ export interface DataMessage {
   data: any;
   id: string;
 }
+export interface StoreMessage {
+  // 消息类型
+  type: MESSAGE_TYPE.store;
+  // 消息上下文
+  content?: Content;
+  data: any;
+  id: string;
+}
 
 export type Message = PayloadMessage | InitMessage | DataMessage;

@@ -9,7 +9,8 @@ export enum ACTION {
 export const FUNC_PREFIX = '__func__';
 
 export enum MESSAGE_TYPE {
-  init,
-  data,
-  payload,
+  init = 'init',
+  data = 'data',
+  payload = 'payload',
+  store = 'store',
 }

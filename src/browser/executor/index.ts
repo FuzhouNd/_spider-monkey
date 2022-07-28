@@ -1,4 +1,5 @@
 import { ActionMap, Payload } from './type';
+import { store } from '@/browser/store';
 
 const modules = import.meta.glob('./action/*.ts', { eager: true });
 
@@ -7,10 +8,10 @@ const actionMap = Object.keys(modules).reduce((re, key) => {
   return { ...re, ..._module };
 }, {} as ActionMap);
 
-async function execPayload(payloadList: Payload[]|Payload) {
+async function execPayload(payloadList: Payload[] | Payload) {
   let t: any = void 0;
-  if(!Array.isArray(payloadList)){
-    payloadList = [payloadList]
+  if (!Array.isArray(payloadList)) {
+    payloadList = [payloadList];
   }
   for (const payload of payloadList) {
     const { action, params } = payload;
