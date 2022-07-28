@@ -1,6 +1,7 @@
 import { FUNC_PREFIX } from '@/browser/enum';
 import { delay } from '@/utils';
 import * as R from 'ramda';
+import { store } from '@/browser/store';
 
 interface ExecFunc {
   (...args: any[]): any;
@@ -25,16 +26,7 @@ export async function getFunc(funcStr = '', name = 'zxx'): Promise<ExecFunc> {
   }
 }
 
-export async function map(t: any, funcStr = '') {
-  const func = await getFunc(funcStr, 'map');
-  const re = t.map((...params) => {
-    return func(...params);
-  });
-  func.destroy();
-  return re;
-}
-
-async function _eval(t: any, funcStr: string, data: any) {
+async function _eval(t: any, funcStr: string) {
   const func = await getFunc(funcStr, 'eval');
   const re = await func({ R, delay, data });
   func.destroy();

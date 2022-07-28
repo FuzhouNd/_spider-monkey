@@ -1,5 +1,4 @@
 import { ActionMap, Payload } from './type';
-import { store } from '@/browser/store';
 
 const modules = import.meta.glob('./action/*.ts', { eager: true });
 
