@@ -7,8 +7,7 @@ const actionMap = Object.keys(modules).reduce((re, key) => {
   return { ...re, ..._module };
 }, {} as ActionMap);
 
-console.log(actionMap, 'actionMap');
-async function exec(payloadList: Payload[]|Payload) {
+async function execPayload(payloadList: Payload[]|Payload) {
   let t: any = void 0;
   if(!Array.isArray(payloadList)){
     payloadList = [payloadList]
@@ -18,9 +17,8 @@ async function exec(payloadList: Payload[]|Payload) {
     if (actionMap[action]) {
       t = await actionMap[action](t, ...params);
     }
-    console.log(t, 't');
   }
-  return { data: t };
+  return t;
 }
 
-export { exec };
+export { execPayload };

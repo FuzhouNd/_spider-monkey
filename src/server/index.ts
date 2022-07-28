@@ -5,64 +5,35 @@ import cors from 'cors';
 import expressWs from 'express-ws';
 import dayjs from 'dayjs';
 import { EventEmitter } from 'events';
-import { DataMessage, Message, PayloadMessage } from '@/browser/socket/type';
+import { DataMessage, Message, PayloadMessage, InitMessage } from '@/browser/socket/type';
 import { Payload } from '@/browser/executor/type';
+import { send, exec } from './message';
+import { MESSAGE_TYPE } from '@/browser/enum';
 
 const appBase = express();
 appBase.use(cors());
 const { app } = expressWs(appBase);
 
 // parse application/json
-app.use(express.json({ limit: '10mb' }));
+// app.use(express.json({ limit: '10mb' }));
 
 const eventEmit = new EventEmitter();
 app.ws('/exec', function (ws, req) {
   ws.on('message', (msg: string) => {
-    // resolve(JSON.parse(msg));
     const message: Message = JSON.parse(msg);
-    // console.log(msg);
-    function send(message: PayloadMessage): Promise<Message> {
-      return new Promise((resolve) => {
-        const _ws = ws as unknown as WebSocket;
-        // 把入参处理下
-        if (Array.isArray(message.data)) {
-          message.data = message.data.map((item) => {
-            return {
-              ...item,
-              params: item.params.map((p) => {
-                if (typeof p === 'function') {
-                  return p.toString();
-                }
-                return p;
-              }),
-            };
-          });
-        } else {
-          message.data.params = message.data.params.map((p) => {
-            if (typeof p === 'function') {
-              return p.toString();
-            }
-            return p;
-          })
-        }
-        _ws.send(JSON.stringify(message));
-        const li = (evt: MessageEvent<string>) => {
-          const data = JSON.parse(evt.data) as Message;
-          if (data.id === message.id) {
-            resolve(data);
-            _ws.removeEventListener('message', li);
-          }
-        };
-        _ws.addEventListener('message', li);
-      });
+    if (message.type === MESSAGE_TYPE.init) {
+      // 回复运行时，后端准备ok
+      ws.send(JSON.stringify({ id: message.id, data: true, type: MESSAGE_TYPE.data }));
+      // 调用注册的函数
+      eventEmit.emit('init', { ws, message });
     }
-    eventEmit.emit('message', { send, message });
   });
 });
+type CB = (params: { ws: WebSocket; message: InitMessage }) => void;
 
-export function useCallBack(cb: ({ send, message }: { send: (message: Message) => Promise<Message>; message: Message }) => {}) {
-  eventEmit.addListener('message', cb);
+export function useCallBack(cb: CB) {
+  eventEmit.addListener('init', cb);
 }
-
-app.listen(8998);
-console.log('服务在8998端口');
+const PORT = 8998;
+app.listen(PORT);
+console.log(`服务器监听在${PORT}端口`);

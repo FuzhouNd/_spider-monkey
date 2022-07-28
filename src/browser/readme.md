@@ -7,3 +7,7 @@ send([
   genQueryPayload(),
   genTextContentPayload(),
 ])
+
+
+# 运行时逻辑
+- socket初始化

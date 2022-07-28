@@ -1,28 +1,12 @@
 // import { send } from '@/server';
-import { ACTION, MESSAGE_TYPE } from '@/browser/enum';
 import { useCallBack } from '@/server/index';
+import { exec } from '@/server/message';
 
-function funcToString(func: Function) {
-  return func.toString();
-}
 
-useCallBack(async ({ send, message }) => {
-  if (message.type === MESSAGE_TYPE.init) {
-    const data = await send({
-      type: MESSAGE_TYPE.payload,
-      data: [
-        {
-          action: 'eval',
-          params: [
-           () => {
-              return [...document.querySelectorAll('a')].map((d) => d.textContent);
-            },
-          ],
-        },
-      ],
-      id: new Date().valueOf().toString(),
-    });
-    console.log(data, 'data');
-    // data.data
-  }
+useCallBack(async ({ ws, message }) => {
+  const data = await exec(ws, () => {
+    return [...document.querySelectorAll('a')].map((d) => d.textContent);
+  });
+  console.log(data);
+  // data.data
 });

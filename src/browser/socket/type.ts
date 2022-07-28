@@ -23,7 +23,7 @@ export interface DataMessage {
   type: MESSAGE_TYPE.data;
   // 消息上下文
   content?: Content;
-  data: { [key: string]: any };
+  data: any;
   id: string;
 }
 

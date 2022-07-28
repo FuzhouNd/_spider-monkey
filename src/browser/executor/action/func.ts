@@ -1,5 +1,6 @@
 import { FUNC_PREFIX } from '@/browser/enum';
 import { delay } from '@/utils';
+import * as R from 'ramda';
 
 interface ExecFunc {
   (...args: any[]): any;
@@ -33,10 +34,11 @@ export async function map(t: any, funcStr = '') {
   return re;
 }
 
-async function _eval(t: any, funcStr: string) {
+async function _eval(t: any, funcStr: string, data: any) {
   const func = await getFunc(funcStr, 'eval');
-  const re = await func();
-  func.destroy()
-  return re
+  const re = await func({ R, delay, data });
+  func.destroy();
+  return re;
 }
-export {_eval as eval}
+
+export { _eval as eval };

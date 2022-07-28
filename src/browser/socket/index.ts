@@ -1,13 +1,13 @@
-import { exec } from '@/browser/executor/index';
+import { execPayload } from '@/browser/executor/index';
 import { MESSAGE_TYPE } from '@/browser/enum';
-import type {  Message } from './type';
+import type { InitMessage, Message, PayloadMessage, DataMessage } from './type';
 import { Payload } from '@/browser/executor/type';
 
 const VITE_EXPORT_NAME = import.meta.env.VITE_EXPORT_NAME;
 // @ts-ignore
 let socket: WebSocket | undefined = window[VITE_EXPORT_NAME];
 
-function sendMessage(message: Message): Promise<Payload | Payload[]> {
+function sendMessage(message: PayloadMessage | InitMessage): Promise<DataMessage> {
   return new Promise((resolve, reject) => {
     if (socket) {
       socket.send(JSON.stringify(message));
@@ -26,33 +26,40 @@ function sendMessage(message: Message): Promise<Payload | Payload[]> {
   });
 }
 
+function sendDataMessage(message: DataMessage) {
+  if (socket) {
+    socket.send(JSON.stringify(message));
+  } else {
+    throw Error('need init socket');
+  }
+}
+
 async function sendInitMessage() {
-  const payload = await sendMessage({
+  const data = await sendMessage({
     type: MESSAGE_TYPE.init,
     content: { url: location.href },
     id: new Date().valueOf().toString(),
   });
-  const data = await exec(payload);
-  await sendMessage({ type: MESSAGE_TYPE.data, data, content: { url: location.href }, id: new Date().valueOf().toString() });
-  console.log('runtime init success');
+  if (data.data) {
+    console.log('runtime init success');
+  } else {
+    throw Error('runtime init fail');
+  }
 }
 
-async function onMessage() {
-  return new Promise((resolve, reject) => {
-    if (socket) {
-      const li = async (evt) => {
-        const message: Message = JSON.parse(evt.data);
-        if (message.type === MESSAGE_TYPE.payload) {
-          const data = await exec(message.data);
-          sendMessage({ type: MESSAGE_TYPE.data, data, id: message.id });
-          resolve(true);
-        }
-      };
-      socket.addEventListener('message', li);
-    } else {
-      reject('need init socket');
-    }
-  });
+async function onPayloadMessage() {
+  if (socket) {
+    const li = async (evt) => {
+      const message: PayloadMessage = JSON.parse(evt.data);
+      if (message.type === MESSAGE_TYPE.payload) {
+        const data = await execPayload(message.data);
+        sendDataMessage({ type: MESSAGE_TYPE.data, data, id: message.id });
+      }
+    };
+    socket.addEventListener('message', li);
+  } else {
+    throw Error('need init socket');
+  }
 }
 
 async function initSocket() {
@@ -61,10 +68,10 @@ async function initSocket() {
     socket = new WebSocket('ws://127.0.0.1:8998/exec');
     // @ts-ignore
     window[VITE_EXPORT_NAME] = socket;
-    socket.addEventListener('open', () => {
+    socket.addEventListener('open', async () => {
       // 监听消息，执行payload
-      onMessage();
-      sendInitMessage();
+      onPayloadMessage();
+      await sendInitMessage();
     });
     socket.addEventListener('close', () => {
       //@ts-ignore
