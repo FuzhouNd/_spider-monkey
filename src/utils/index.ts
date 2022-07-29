@@ -14,6 +14,9 @@ export function delay(n = 6 * 1000) {
 export function deleteSemi(params:string) {
   return params.replace(/[;]/g, '；')
 }
+export function deleteComma(params:string) {
+  return params.replace(/[;]/g, '；')
+}
 export function deleteRF(params:string) {
   return params.replace(/[\s]/g, ' ')
 }
