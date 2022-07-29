@@ -26,9 +26,9 @@ export async function getFunc(funcStr = '', name = 'zxx'): Promise<ExecFunc> {
   }
 }
 
-async function _eval(t: any, funcStr: string) {
+async function _eval(t: any, funcStr: string, data: any) {
   const func = await getFunc(funcStr, 'eval');
-  const re = await func({ R, delay, data });
+  const re = await func({ R, delay }, data);
   func.destroy();
   return re;
 }

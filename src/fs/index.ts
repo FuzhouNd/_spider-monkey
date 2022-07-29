@@ -3,7 +3,10 @@ import R from 'ramda';
 
 type OB = { [key: string]: string | number };
 
-export function writeFile(filePath: string, data: OB[] | OB | string | string[]) {
+export function writeFile(filePath: string, data: OB[] | OB | string | string[] | undefined) {
+  if (!data) {
+    return;
+  }
   if (typeof data === 'string') {
     fs.writeFileSync(filePath, data + '\r\n', { flag: 'a' });
     return;
@@ -13,7 +16,7 @@ export function writeFile(filePath: string, data: OB[] | OB | string | string[])
     return;
   }
   data.forEach((d) => {
-    writeFile(filePath, d)
+    writeFile(filePath, d);
   });
 }
 

@@ -1,5 +1,7 @@
 import { MESSAGE_TYPE } from '@/browser/enum';
 import { DataMessage, Message, PayloadMessage } from '@/browser/socket/type';
+import * as R from 'ramda';
+import { delay } from '@/utils';
 
 export function send(ws: WebSocket, message: PayloadMessage): Promise<DataMessage> {
   return new Promise((resolve) => {
@@ -35,15 +37,8 @@ export function send(ws: WebSocket, message: PayloadMessage): Promise<DataMessag
     ws.addEventListener('message', li);
   });
 }
-export async function exec<T extends (...args: any) => any>(ws: WebSocket, func: T, _data?: any): Promise<ReturnType<T>> {
-  const data = await send(ws, {
-    id: new Date().valueOf().toString(),
-    type: MESSAGE_TYPE.payload,
-    data: [{ action: 'eval', params: [func.toString(), _data] }],
-  });
-  return data.data;
-}
-export async function execList<T extends (...args: any) => any>(ws: WebSocket, func: T[], _data?: any): Promise<ReturnType<T>> {
+type Func<T> = (G: { R: typeof R; delay: typeof delay }, data: T) => any;
+export async function exec<K, T extends Func<K>>(ws: WebSocket, func: T, _data?: K): Promise<ReturnType<T>> {
   const data = await send(ws, {
     id: new Date().valueOf().toString(),
     type: MESSAGE_TYPE.payload,

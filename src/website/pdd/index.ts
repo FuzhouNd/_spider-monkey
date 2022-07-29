@@ -3,17 +3,25 @@ import { useCallBack } from '@/server/index';
 import { exec } from '@/server/message';
 import { ExecFuncParams } from '@/browser/executor/type';
 import { range } from 'ramda';
+import { writeFile } from '@/fs';
 
 const imgUrlList: string[] = [];
 
-
-const func = async ({ delay, R, data }: ExecFuncParams) => {
+const browserFunc = async ({ delay, R, data }: ExecFuncParams) => {
   const sl = data as string[];
   await delay(3 * 1000);
-  const aList = [...document.querySelectorAll('._3glhOBhU img')].filter((d) => {
-    const src = (d as HTMLImageElement)?.src || '';
-    return !sl.includes(src as string) && src.endsWith('webp');
-  }) as HTMLImageElement[];
+  let aList: HTMLImageElement[] = [];
+  while (true) {
+    aList = [...document.querySelectorAll('._3glhOBhU img')].filter((d) => {
+      const src = (d as HTMLImageElement)?.src || '';
+      return !sl.includes(src as string) && src.endsWith('webp');
+    }) as HTMLImageElement[];
+    if (!aList.length) {
+      document.querySelector('html')?.scrollBy(0, 1000);
+    } else {
+      break;
+    }
+  }
   for (const a of aList) {
     setTimeout(() => {
       a?.click();
@@ -23,28 +31,28 @@ const func = async ({ delay, R, data }: ExecFuncParams) => {
       .filter((d) => d)
       .slice(0, 1);
   }
-  // html?.scrollBy(0, 1000);
-  // await delay(2000);
 };
 
 useCallBack(async ({ ws, message }) => {
   if (message.content.url.includes('https://mobile.yangkeduo.com/search_result.html')) {
-   
-    const resData = await exec(ws, func, imgUrlList);
+    const resData = await exec(ws, browserFunc, imgUrlList);
     imgUrlList.push(...(resData || []));
-    console.log(resData, 'resData');
+    console.log(imgUrlList, 'imgUrlList');
   }
   // data.data
 });
 useCallBack(async ({ ws, message }) => {
   if (message.content.url.includes('https://mobile.yangkeduo.com/goods.html')) {
     const func = async ({ delay, R, data }: ExecFuncParams) => {
-      await delay(6000);
-      window.history.back();
-      return 1;
+      const price = document.querySelector('[data-uniqid="11"] [role="button"]')?.textContent || '';
+      const title = document.querySelector('.enable-select')?.textContent || '';
+      const name = document.querySelector('._1g9X2Rjz')?.textContent || '';
+      setTimeout(() => {
+        window.history.back();
+      }, 6000);
+      return { price, title, name };
     };
     const data = await exec(ws, func, imgUrlList);
+    writeFile('./data/pdd.csv', data)
   }
-  // console.log(data);
-  // data.data
 });

@@ -47,23 +47,6 @@ async function sendInitMessage() {
     throw Error('runtime init fail');
   }
 }
-// 状态同步
-
-async function onStoreSync() {
-  if (socket) {
-    const li = async (evt) => {
-      const message: StoreMessage = JSON.parse(evt.data);
-      if (message.type === MESSAGE_TYPE.store) {
-        const data = message.data;
-        store.set(data)
-        sendDataMessage({ type: MESSAGE_TYPE.data, data, id: message.id });
-      }
-    };
-    socket.addEventListener('message', li);
-  } else {
-    throw Error('need init socket');
-  }
-}
 
 async function onPayloadMessage() {
   if (socket) {
@@ -89,7 +72,6 @@ async function initSocket() {
     socket.addEventListener('open', async () => {
       // 监听消息，执行payload
       onPayloadMessage();
-      onStoreSync();
       await sendInitMessage();
     });
     socket.addEventListener('close', () => {
