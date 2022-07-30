@@ -36,7 +36,7 @@ export function writeFile(filePath: string, data: OB[] | OB | string | string[] 
 
 export function readFile(filePath: string) {
   if (!fs.pathExistsSync(filePath)) {
-    return '';
+    return [];
   }
   return fs
     .readFileSync(filePath, { encoding: 'utf-8' })

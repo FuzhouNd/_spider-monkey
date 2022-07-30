@@ -21,7 +21,7 @@ useCallBack(async ({ ws, message }) => {
         },
         id
       );
-      await delay(5 * 60 * 1000);
+      await delay(2 * 60 * 1000);
     }
   }
   // console.log(message);
@@ -55,7 +55,8 @@ useCallBack(async ({ ws, message }) => {
           return (
             e.textContent?.includes('申请人名称(中文)') ||
             e.textContent?.includes('申请人地址(中文)') ||
-            e.textContent?.includes('国际分类')
+            e.textContent?.includes('国际分类') ||
+            e.textContent?.includes('商标名称')
           );
         })
         .map((e) => {
@@ -71,10 +72,15 @@ useCallBack(async ({ ws, message }) => {
         const address = brandDetail.find((d) => d.label === '申请人地址(中文)')?.value || '';
         const name = brandDetail.find((d) => d.label === '申请人名称(中文)')?.value || '';
         const ca = brandDetail.find((d) => d.label === '国际分类')?.value || '';
+        const brandName = brandDetail.find((d) => d.label === '商标名称')?.value || '';
         setTimeout(() => {
           window.close();
         }, 1000);
-        window.open(`https://www.qcc.com/web/search?key=${encodeURIComponent(name)}&pos=${encodeURIComponent(address)}&cate=${ca}`);
+        window.open(
+          `https://www.qcc.com/web/search?key=${encodeURIComponent(name)}&pos=${encodeURIComponent(address)}&cate=${encodeURIComponent(
+            ca
+          )}&bName=${encodeURIComponent(brandName)}`
+        );
       },
       brandDetail
     );
@@ -82,41 +88,84 @@ useCallBack(async ({ ws, message }) => {
   // data.data
 });
 useCallBack(async ({ ws, message }) => {
-  if (message.content.url.includes('https://www.qcc.com/web/search')) {
-    const resData = await exec(ws, async ({ R, delay }) => {
-      const searchParams = new URL(location.href).searchParams;
-      const address = searchParams.get('pos') || '';
-      const cate = searchParams.get('cate') || '';
-      for (const index of R.range(0, 3)) {
-        await delay(1000);
-        for (const e of [...document.querySelectorAll('a.pills-item')]) {
-          const elemText = (e.textContent || '@').replace(/\([0-9]*\)/g, '').replace(/[\s]*/g, '');
-          console.log(elemText, address, address.includes(elemText));
-          if (address.includes(elemText)) {
-            (e as HTMLLinkElement).click();
-            await delay(3000);
-          }
-          if (cate.includes('餐饮') && elemText.includes('住宿和餐饮业')) {
-            (e as HTMLLinkElement).click();
-            await delay(3000);
+  if (message.content.url.includes('https://www.qcc.com/web/search') && !message.content.url.includes('trademark')) {
+    const resData = await exec(
+      ws,
+      async ({ R, delay }, id) => {
+        const searchParams = new URL(location.href).searchParams;
+        const address = searchParams.get('pos') || '';
+        const name = searchParams.get('key') || '';
+        const cate = searchParams.get('cate') || '';
+        const bName = searchParams.get('bName') || '';
+        for (const index of R.range(0, 3)) {
+          await delay(1000);
+          let hasCateClick = false;
+          for (const e of [...document.querySelectorAll('a.pills-item')]) {
+            const originElemText = e.textContent || '@';
+            if (true) {
+              const elemText = originElemText.replace(/\([0-9]*\)/g, '').replace(/[\s]*/g, '');
+              if (cate.includes('餐饮') && elemText.includes('住宿和餐饮业') && !hasCateClick) {
+                (e as HTMLLinkElement).click();
+                hasCateClick = true;
+                await delay(3000);
+              }
+              if (address.includes(elemText)) {
+                (e as HTMLLinkElement).click();
+                await delay(3000);
+                break;
+              }
+            }
           }
         }
-      }
-      const cellDom = document.querySelector('.search-cell');
-      if (cellDom) {
-        let phone = '';
-        let title = cellDom.querySelector('.title.copy-value')?.textContent?.replace(/[\s]/g, '') || '';
-        for (const trDom of [...cellDom.querySelectorAll('tr .f')]) {
-          if (trDom.textContent?.includes('电话')) {
-            phone = trDom.textContent.replace(/[\s]/g, '');
-          }
+        let legalCellDomList: Element | Element[] | undefined = void 0;
+        const cellDomList = [...document.querySelectorAll('.search-cell table tr')];
+        const filteredCellDomList = cellDomList.filter((_cellDom) => {
+          const title = _cellDom.querySelector('.title.copy-value')?.textContent || '';
+          return bName
+            .split(' ')
+            .filter((d) => d)
+            .some((b) => title.includes(b));
+        });
+        if (filteredCellDomList.length) {
+          legalCellDomList = filteredCellDomList.filter((_cellDom) => {
+            const isSurvival = !!_cellDom.querySelector('.copy-title .nstatus.text-success');
+            const isPhoneDanger = !!_cellDom?.querySelector?.('.phone-status-icon.danger');
+            return isSurvival && !isPhoneDanger;
+          });
+        } else {
+          legalCellDomList = cellDomList.filter((_cellDom) => {
+            const isSurvival = !!_cellDom.querySelector('.copy-title .nstatus.text-success');
+            const isPhoneDanger = !!_cellDom?.querySelector?.('.phone-status-icon.danger');
+            return isSurvival && !isPhoneDanger;
+          });
         }
+        if (!legalCellDomList.length) {
+          setTimeout(() => {
+            window.close();
+          }, 2000);
+          return;
+        }
+        const reList = legalCellDomList
+          .filter((d) => d)
+          .map((_cellDom: Element) => {
+            let phone = '';
+            let title = _cellDom.querySelector('.title.copy-value')?.textContent?.replace(/[\s]/g, '') || '';
+            let shopAddress = _cellDom.querySelector('.copy-value.address-map')?.textContent?.replace(/[\s]/g, '') || '';
+            for (const trDom of [..._cellDom.querySelectorAll('tr .f')]) {
+              if (trDom.textContent?.includes('电话')) {
+                phone = trDom.textContent.replace(/[\s]/g, '');
+              }
+            }
+            phone = phone.replace(/更多[0-9]*/g, '');
+            return { name, phone, id, bName, title, address, shopAddress };
+          }).filter(e => !e.phone.startsWith('电话：-'))
         setTimeout(() => {
           window.close();
-        }, 1000);
-        return { phone, title, id: _id };
-      }
-    });
+        }, 2000);
+        return reList;
+      },
+      _id
+    );
     console.log(resData, 'resData');
     writeFile('./data/qcco.csv', resData);
   }
