@@ -9,9 +9,11 @@ import { delay } from '@/utils';
 const idList: string[] = readFile('./data/qcc.csv').map((d) => d[0]);
 
 // 开始
+let _id = '';
 useCallBack(async ({ ws, message }) => {
   if (message.content.url === 'https://www.qcc.com/') {
     for (const id of idList) {
+      _id = id;
       await exec(
         ws,
         ({ R, delay }, id) => {
@@ -19,7 +21,7 @@ useCallBack(async ({ ws, message }) => {
         },
         id
       );
-      await delay(15 * 1000);
+      await delay(5 * 60 * 1000);
     }
   }
   // console.log(message);
@@ -103,7 +105,7 @@ useCallBack(async ({ ws, message }) => {
       const cellDom = document.querySelector('.search-cell');
       if (cellDom) {
         let phone = '';
-        const title = cellDom.querySelector('.title.copy-value')?.textContent?.replace(/[\s]/g, '') || ''
+        let title = cellDom.querySelector('.title.copy-value')?.textContent?.replace(/[\s]/g, '') || '';
         for (const trDom of [...cellDom.querySelectorAll('tr .f')]) {
           if (trDom.textContent?.includes('电话')) {
             phone = trDom.textContent.replace(/[\s]/g, '');
@@ -112,11 +114,11 @@ useCallBack(async ({ ws, message }) => {
         setTimeout(() => {
           window.close();
         }, 1000);
-        return { phone, title };
+        return { phone, title, id: _id };
       }
     });
     console.log(resData, 'resData');
-    writeFile('./data/qcco.csv', resData)
+    writeFile('./data/qcco.csv', resData);
   }
   // data.data
 });
