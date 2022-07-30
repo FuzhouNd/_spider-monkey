@@ -87,10 +87,10 @@ async function getAll() {
     method: 'POST',
     mode: 'cors',
   });
-  const beginPage = Math.floor(readFile('./data/jd.csv').length / 10);
+  const beginPage = Math.floor(readFile('./data/jd.csv').length / 10) === 0 ? 1 : Math.floor(readFile('./data/jd.csv').length / 10);
   const data = (await res.json()) as TableData;
   const totalPage = data.data.totalItem / 10;
-  for (const page of range(beginPage + 1, totalPage + 1)) {
+  for (const page of range(beginPage, totalPage + 1)) {
     await get(page);
   }
 }
