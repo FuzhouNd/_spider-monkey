@@ -12,6 +12,9 @@ const idList: string[] = readFile('./data/qcc.csv').map((d) => d[0]);
 let _id = '';
 useCallBack(async ({ ws, message }) => {
   if (message.content.url === 'https://www.qcc.com/') {
+    setInterval(() => {
+      exec(ws, ()=>console.log(123))
+    }, 1000)
     for (const id of idList) {
       _id = id;
       await exec(
