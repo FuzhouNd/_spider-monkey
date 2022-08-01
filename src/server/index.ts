@@ -30,7 +30,7 @@ app.ws('/spider-runtime', function (ws, req) {
     const message: Message = JSON.parse(msg);
     if (message.type === MESSAGE_TYPE.init) {
       // 回复运行时，后端准备ok
-      const webSocketId = new Date().valueOf().toString();
+      const webSocketId = message.webSocketId || new Date().valueOf().toString();
       ws.send(JSON.stringify({ messageId: message.messageId, data: true, type: MESSAGE_TYPE.data, webSocketId }));
       addWs(ws as unknown as WebSocket, webSocketId);
       // 调用注册的函数

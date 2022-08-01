@@ -40,6 +40,7 @@ async function initMessage() {
     type: MESSAGE_TYPE.init,
     content: { url: location.href },
     messageId: new Date().valueOf().toString(),
+    webSocketId: window.name,
   });
   if (data.data) {
     webSocketId = data.data.webSocketId;

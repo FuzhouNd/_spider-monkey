@@ -18,6 +18,7 @@ export interface InitMessage {
   // 消息上下文
   content: Content;
   messageId: string;
+  webSocketId?: string;
 }
 export interface DataMessage {
   // 消息类型
