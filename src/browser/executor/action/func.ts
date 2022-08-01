@@ -1,7 +1,6 @@
 import { FUNC_PREFIX } from '@/browser/enum';
 import { delay } from '@/utils';
 import * as R from 'ramda';
-import { store } from '@/browser/store';
 
 interface ExecFunc {
   (...args: any[]): any;

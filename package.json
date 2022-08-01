@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "server": "pnpm esno ./src/server/index.ts",
+    "server": "pnpm tsx ./src/server/index.ts",
     "build": "tsc --noEmit -p ./src/browser/tsconfig.json && vite build"
   },
   "keywords": [],

@@ -9,14 +9,15 @@ export interface PayloadMessage {
   // 消息上下文
   content?: Content;
   data: Payload | Payload[];
-  id: string;
+  messageId: string;
+  webSocketId: string;
 }
 export interface InitMessage {
   // 消息类型
   type: MESSAGE_TYPE.init;
   // 消息上下文
   content: Content;
-  id: string;
+  messageId: string;
 }
 export interface DataMessage {
   // 消息类型
@@ -24,15 +25,8 @@ export interface DataMessage {
   // 消息上下文
   content?: Content;
   data: any;
-  id: string;
-}
-export interface StoreMessage {
-  // 消息类型
-  type: MESSAGE_TYPE.store;
-  // 消息上下文
-  content?: Content;
-  data: any;
-  id: string;
+  messageId: string;
+  webSocketId: string;
 }
 
 export type Message = PayloadMessage | InitMessage | DataMessage;
