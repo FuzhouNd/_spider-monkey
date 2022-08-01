@@ -2,4 +2,4 @@
 
 ### todo
 - tsc 编译
-- 管线运行
+- 实现puppeteer 一样的操作

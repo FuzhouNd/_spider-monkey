@@ -17,6 +17,13 @@ const { app } = expressWs(appBase);
 // parse application/json
 // app.use(express.json({ limit: '10mb' }));
 
+
+function heartBeat(){
+  
+}
+
+
+
 const eventEmit = new EventEmitter();
 app.ws('/exec', function (ws, req) {
   ws.on('message', (msg: string) => {

@@ -37,6 +37,8 @@ export function send(ws: WebSocket, message: PayloadMessage): Promise<DataMessag
     ws.addEventListener('message', li);
   });
 }
+
+
 type Func<T> = (G: { R: typeof R; delay: typeof delay }, data: T) => any;
 export async function exec<K, T extends Func<K>>(ws: WebSocket, func: T, _data?: K): Promise<ReturnType<T>> {
   const data = await send(ws, {
