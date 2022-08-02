@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         spider-runtime
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.2.1
 // @description  help control browser
 // @author       zxxzzzzz
 // @include      *
