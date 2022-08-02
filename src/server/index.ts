@@ -23,8 +23,7 @@ function heartBeat(ws: WebSocket) {
     const dateStr = await exec(ws, () => new Date().toLocaleString());
   }, 30 * 1000);
 }
-
-const eventEmit = new EventEmitter();
+const eventEmitter = new EventEmitter();
 app.ws('/spider-runtime', function (ws, req) {
   ws.on('message', (msg: string) => {
     const message: Message = JSON.parse(msg);
@@ -33,15 +32,15 @@ app.ws('/spider-runtime', function (ws, req) {
       const webSocketId = message.webSocketId || new Date().valueOf().toString();
       ws.send(JSON.stringify({ messageId: message.messageId, data: true, type: MESSAGE_TYPE.data, webSocketId }));
       addWs(ws as unknown as WebSocket, webSocketId);
-      // 调用注册的函数
-      eventEmit.emit('init', { ws, message });
+      if (!message.webSocketId) {
+        eventEmitter.emit('init');
+      }
     }
   });
 });
-type CB = (params: { ws: WebSocket; message: InitMessage }) => void;
 
-export function useCallBack(cb: CB) {
-  eventEmit.addListener('init', cb);
+export function useCallback(a: () => void) {
+  eventEmitter.addListener('init', a);
 }
 
 const PORT = 8998;

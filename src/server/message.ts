@@ -29,7 +29,7 @@ export function send(ws: WebSocket, message: PayloadMessage): Promise<DataMessag
     ws.send(JSON.stringify(message));
     const li = (evt: MessageEvent<string>) => {
       const data = JSON.parse(evt.data) as DataMessage;
-      if (data.id === message.id) {
+      if (data.messageId === message.messageId) {
         resolve(data);
         ws.removeEventListener('message', li);
       }
@@ -38,13 +38,13 @@ export function send(ws: WebSocket, message: PayloadMessage): Promise<DataMessag
   });
 }
 
-
 type Func<T> = (G: { R: typeof R; delay: typeof delay }, data: T) => any;
 export async function exec<K, T extends Func<K>>(ws: WebSocket, func: T, _data?: K): Promise<ReturnType<T>> {
   const data = await send(ws, {
-    id: new Date().valueOf().toString(),
+    messageId: new Date().valueOf().toString(),
     type: MESSAGE_TYPE.payload,
     data: [{ action: 'eval', params: [func.toString(), _data] }],
+    webSocketId: ws.__webSocketId__ || '',
   });
   return data.data;
 }

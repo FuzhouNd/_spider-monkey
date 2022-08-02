@@ -19,8 +19,9 @@ function sendMessage(message: Message): Promise<DataMessage> {
       if (message.type === MESSAGE_TYPE.init || message.type === MESSAGE_TYPE.payload) {
         socket.send(JSON.stringify(message));
         const li = (evt: MessageEvent) => {
-          if (evt.data?.messageId === message.messageId) {
-            resolve(JSON.parse(evt.data));
+          const data = JSON.parse(evt.data);
+          if (data?.messageId === message.messageId) {
+            resolve(data);
             if (socket) {
               socket?.removeEventListener('message', li);
             }
@@ -42,8 +43,9 @@ async function initMessage() {
     messageId: new Date().valueOf().toString(),
     webSocketId: window.name,
   });
-  if (data.data) {
-    webSocketId = data.data.webSocketId;
+  console.log('data', data);
+  if (data) {
+    webSocketId = data.webSocketId;
     console.log('runtime init success', webSocketId);
   } else {
     throw Error('runtime init fail');
@@ -56,6 +58,7 @@ async function onPayloadMessage() {
       const message: PayloadMessage = JSON.parse(evt.data);
       if (message.type === MESSAGE_TYPE.payload) {
         const data = await execPayload(message.data);
+        console.log('data', data);
         sendMessage({ type: MESSAGE_TYPE.data, data, messageId: message.messageId, webSocketId });
       }
     };
