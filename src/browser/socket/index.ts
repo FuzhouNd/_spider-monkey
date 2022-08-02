@@ -43,7 +43,6 @@ async function initMessage() {
     messageId: new Date().valueOf().toString(),
     webSocketId: window.name,
   });
-  console.log('data', data);
   if (data) {
     webSocketId = data.webSocketId;
     console.log('runtime init success', webSocketId);
@@ -58,7 +57,6 @@ async function onPayloadMessage() {
       const message: PayloadMessage = JSON.parse(evt.data);
       if (message.type === MESSAGE_TYPE.payload) {
         const data = await execPayload(message.data);
-        console.log('data', data);
         sendMessage({ type: MESSAGE_TYPE.data, data, messageId: message.messageId, webSocketId });
       }
     };

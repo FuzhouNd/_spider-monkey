@@ -14,7 +14,6 @@ const idList: string[] = readFile('./data/qcc.csv').map((d) => d[0]);
 useCallback(async () => {
   for (const id of idList) {
     const ws1 = await createPage(`https://www.qcc.com/web/search/trademark?key=${id}&type=shangbiao&sbSearchType=1`);
-    console.log(ws1.webSocketId, 'webSocketId');
     // await exec(
     //   ws,
     //   ({ R, delay }, id) => {

@@ -18,7 +18,6 @@ export function createPage(url: string): Promise<{ ws: WebSocket; webSocketId: s
       },
       url
     );
-    console.log(resWebSocketId);
     const Max = 3;
     let index = 0;
     while (true) {

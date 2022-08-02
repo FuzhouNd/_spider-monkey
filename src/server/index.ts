@@ -9,7 +9,7 @@ import { DataMessage, Message, PayloadMessage, InitMessage } from '@/browser/soc
 import { Payload } from '@/browser/executor/type';
 import { send, exec } from './message';
 import { MESSAGE_TYPE } from '@/browser/enum';
-import { addWs } from './wsStore';
+import { addWs, getWsCount } from './wsStore';
 
 const appBase = express();
 appBase.use(cors());
@@ -32,7 +32,9 @@ app.ws('/spider-runtime', function (ws, req) {
       const webSocketId = message.webSocketId || new Date().valueOf().toString();
       ws.send(JSON.stringify({ messageId: message.messageId, data: true, type: MESSAGE_TYPE.data, webSocketId }));
       addWs(ws as unknown as WebSocket, webSocketId);
-      if (!message.webSocketId) {
+      // 不是脚本打开的链接并且ws store里一个可用链接都没有
+      if (!message.webSocketId && getWsCount() === 1) {
+        console.log(new Date().toLocaleString(), '链接成功', message.content.url);
         eventEmitter.emit('init');
       }
     }
