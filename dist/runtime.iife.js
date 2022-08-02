@@ -3,10 +3,10 @@
 // @name         spider-runtime
 // @namespace    http://tampermonkey.net/
 // @version      0.1
-// @description  try to take over the world!
-// @author       You
-// @match        *
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=google.com
+// @description  help control browser
+// @author       zxxzzzzz
+// @include      *
+// @icon         https://cdn.onlinewebfonts.com/svg/img_562349.png
 // @grant        none
 // ==/UserScript==
  */
