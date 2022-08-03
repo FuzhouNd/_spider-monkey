@@ -29,6 +29,7 @@ specifiers:
   tsx: ^3.8.0
   typescript: ^4.7.4
   vite: ^3.0.3
+  vite-plugin-banner: ^0.3.0
   yargs: ^17.5.1
 
 dependencies:
@@ -60,6 +61,7 @@ dependencies:
   tsx: 3.8.0
   typescript: 4.7.4
   vite: 3.0.3
+  vite-plugin-banner: 0.3.0
   yargs: registry.npmmirror.com/yargs/17.5.1
 
 packages:
@@ -1986,6 +1988,10 @@ packages:
   /vary/1.1.2:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
+    dev: false
+
+  /vite-plugin-banner/0.3.0:
+    resolution: {integrity: sha512-3QQVJxIwO1afUoEm10e5J3S8AJ4eVKNL+78q8vW5TQhBYmjogyqBCiRPcax+OyWuECEnRRFSWX0KKrenVGzHOg==}
     dev: false
 
   /vite/3.0.3:
