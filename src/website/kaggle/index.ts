@@ -87,7 +87,7 @@ async function getDetail(idList: number[]) {
     fs.mkdirSync('./data/kaggle', { recursive: true });
   }
   const existFilePathList = glob.sync('./data/kaggle/*.ipynb');
-  let page = Math.floor(existFilePathList.length / 100);
+  let page = 20;
   while (true) {
     page += 1;
     console.log('page', page);
