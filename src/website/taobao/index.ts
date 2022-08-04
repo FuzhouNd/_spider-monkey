@@ -1,12 +1,12 @@
 import { useCallback } from '@/server';
 import { exec } from '@/server/message';
 import { createPage } from '@/server/puppeteer';
-import { getAllWs, removeWs } from '@/server/wsStore';
+import { getAllWs, removeWs,waitForWs } from '@/server/wsStore';
 import { delay } from '@/utils';
 import { writeCsv } from '@/fs';
+import dayjs from 'dayjs';
 
 const goodUrlList = [
-  'https://detail.tmall.com/item.htm?id=657565643973',
   'https://detail.tmall.com/item.htm?id=671227090017',
   'https://detail.tmall.com/item.htm?id=652883475332',
   'https://detail.tmall.com/item.htm?id=614624098327',
@@ -31,12 +31,34 @@ const goodUrlList = [
   'https://detail.tmall.com/item.htm?id=670796920189',
   'https://detail.tmall.com/item.htm?id=564112609064',
   'https://detail.tmall.com/item.htm?id=670568960294',
+  'https://detail.tmall.com/item.htm?id=618261233184',
+  'https://detail.tmall.com/item.htm?id=674213901644',
+  'https://detail.tmall.com/item.htm?id=639464789112',
+  'https://detail.tmall.com/item.htm?id=670576731420',
+  'https://detail.tmall.com/item.htm?id=549183943806',
+  'https://detail.tmall.com/item.htm?id=654001218484',
+  'https://detail.tmall.com/item.htm?id=650732546014',
+  'https://detail.tmall.com/item.htm?id=674027393310',
+  'https://detail.tmall.com/item.htm?id=619321051659',
+  'https://detail.tmall.com/item.htm?id=617359218481',
+  'https://detail.tmall.com/item.htm?id=604431557304',
 ];
 
 useCallback(async () => {
   for (const url of goodUrlList) {
     const ws = await createPage(url);
-    await exec(ws.ws, () => {
+    await delay(2000);
+    const title = await exec(ws.ws, () => {
+      return (document.querySelector('.tb-detail-hd')?.textContent || '').replace(/[\s]*/g, '');
+    });
+    const sale = await exec(ws.ws, () => {
+      return (document.querySelector('.tm-ind-sellCount .tm-indcon')?.textContent || '').replace(/[^0-9]/g, '');
+    });
+    const imgSrc = await exec(ws.ws, () => {
+      return (document.querySelector('#J_ImgBooth') as HTMLImageElement)?.src || '';
+    });
+    await exec(ws.ws, async ({ delay }) => {
+      await delay(1000);
       for (const d of [...document.querySelectorAll('.tb-sku dl.tb-prop.tm-sale-prop')]) {
         const link = d.querySelector('a');
         if (link) {
@@ -44,27 +66,31 @@ useCallback(async () => {
         }
       }
     });
-    await delay(2000);
+    await delay(1000);
     await exec(ws.ws, () => {
       const buyBtn = document.querySelector('#J_LinkBuy') as HTMLButtonElement;
       if (buyBtn) {
         buyBtn.click();
       }
     });
-    await delay(3000);
-    const fWs = getAllWs().find((w) => w.url.includes('https://buy.tmall.com/order/confirm_order'));
+    const fWs = await waitForWs((w) => w.url.includes('https://buy.tmall.com/order/confirm_order'));
+    // console.log(getAllWs(), fWs);
+    if(!fWs){
+      console.log('fail', title, url);
+    }
     if (fWs) {
       const price = await exec(fWs.ws, () => {
+        setTimeout(() => {
+          window.close();
+        }, 2000);
         const priceDom = document.querySelector('.realpay--price') as HTMLDivElement;
         if (priceDom) {
-          setTimeout(() => {
-            window.close();
-          }, 2000);
           return priceDom.textContent || '';
         }
+        return '';
       });
       removeWs(fWs.id);
-      writeCsv('./data/price.csv', [{ url, price }]);
+      writeCsv('./data/price.csv', [{ date: dayjs().format('YYYY-MM-DD HH:mm:ss'), title, url, price, sale, imgSrc }]);
       console.log(price, 'price');
     }
   }

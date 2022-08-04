@@ -27,11 +27,11 @@ const eventEmitter = new EventEmitter();
 app.ws('/spider-runtime', function (ws, req) {
   ws.on('message', (msg: string) => {
     const message: Message = JSON.parse(msg);
+    console.log(message);
     if (message.type === MESSAGE_TYPE.init) {
       // 回复运行时，后端准备ok
       const webSocketId = message.webSocketId || new Date().valueOf().toString();
       ws.send(JSON.stringify({ messageId: message.messageId, data: true, type: MESSAGE_TYPE.data, webSocketId }));
-      console.log({ id: webSocketId, url: message.content.url });
       addWs(ws as unknown as WebSocket, { id: webSocketId, url: message.content.url });
       // 不是脚本打开的链接并且ws store里一个可用链接都没有
       if (!message.webSocketId && getWsCount() === 1) {

@@ -1,12 +1,23 @@
+import { delay } from '@/utils';
+
 let wsList: { id: string; ws: WebSocket; url: string }[] = [];
 
 export function getWsById(id: string) {
   return wsList.find((d) => d.id === id);
 }
 export function getAllWs() {
-  return wsList
+  return wsList;
 }
-
+export async function waitForWs(func: (wsObj: { id: string; ws: WebSocket; url: string }) => boolean) {
+  for (let index = 0; index < 5; index++) {
+    await delay(1000);
+    const ws = getAllWs().find(func);
+    if (ws) {
+      return ws;
+    }
+  }
+  return void 0;
+}
 export function getWs() {
   return wsList[0];
 }
