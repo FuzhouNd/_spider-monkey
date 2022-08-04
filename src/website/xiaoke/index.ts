@@ -6,6 +6,7 @@ import { writeFile, readFile } from '@/fs';
 
 const Cookie = fs.readFileSync(path.resolve(__dirname, './cookie.txt'), { encoding: 'utf-8' });
 const token = fs.readFileSync(path.resolve(__dirname, './token.txt'), { encoding: 'utf-8' });
+const pid = fs.readFileSync(path.resolve(__dirname, './pid.txt'), { encoding: 'utf-8' });
 
 async function getByCompanyName(name: string) {
   const searchBody = { data: { pageNum: 1, page: 1, pageSize: 10, sortType: 30, companyName: name, portalType: 'default' } };
@@ -16,7 +17,7 @@ async function getByCompanyName(name: string) {
       accountid: '668661',
       'cache-control': 'no-cache',
       'content-type': 'application/json',
-      pid: '4020396913479',
+      pid: pid,
       pragma: 'no-cache',
       'sec-ch-ua': `".Not/A)Brand";v="99", "Google Chrome";v="103", "Chromium";v="103"`,
       'sec-ch-ua-mobile': '?0',
@@ -26,7 +27,7 @@ async function getByCompanyName(name: string) {
       'sec-fetch-site': 'same-origin',
       templateid: '',
       token: token,
-      'weimob-pid': '4020396913479',
+      'weimob-pid': pid,
       'x-freeker-client': '3',
       'x-freeker-token': token,
       xkbversion: '0',
@@ -51,7 +52,7 @@ async function getByCompanyName(name: string) {
       accountid: '668661',
       'cache-control': 'no-cache',
       'content-type': 'application/json',
-      pid: '4020396913479',
+      pid: pid,
       pragma: 'no-cache',
       'sec-ch-ua': '".Not/A)Brand";v="99", "Google Chrome";v="103", "Chromium";v="103"',
       'sec-ch-ua-mobile': '?0',
@@ -61,7 +62,7 @@ async function getByCompanyName(name: string) {
       'sec-fetch-site': 'same-origin',
       templateid: '',
       token: token,
-      'weimob-pid': '4020396913479',
+      'weimob-pid': pid,
       'x-freeker-client': '3',
       'x-freeker-token': token,
       xkbversion: '0',
@@ -72,9 +73,40 @@ async function getByCompanyName(name: string) {
     body: `{"data":{"DPID":"${DPID}","contactEncrypt":0,"isReceived":0}}`,
     method: 'POST',
   });
+  const res3 = await fetch('https://www.xiaoke.cn/api/zq/xkb/pc/detailTop', {
+    headers: {
+      accept: '*/*',
+      'accept-language': 'zh-CN,zh;q=0.9',
+      accountid: '668661',
+      'cache-control': 'no-cache',
+      'content-type': 'application/json',
+      pid: pid,
+      pragma: 'no-cache',
+      'sec-ch-ua': '".Not/A)Brand";v="99", "Google Chrome";v="103", "Chromium";v="103"',
+      'sec-ch-ua-mobile': '?0',
+      'sec-ch-ua-platform': '"Windows"',
+      'sec-fetch-dest': 'empty',
+      'sec-fetch-mode': 'cors',
+      'sec-fetch-site': 'same-origin',
+      templateid: '',
+      token: token,
+      'weimob-pid': pid,
+      'x-freeker-client': '3',
+      'x-freeker-token': token,
+      xkbversion: '1',
+      Cookie,
+      Referer: 'https://www.xiaoke.cn/xk/searvistor/find/bigsearh?',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
+    },
+    body: `{"data":{"DPID":"${DPID}","contactEncrypt":0,"isReceived":0}}`,
+    method: 'POST',
+  });
   const detail = (await res2.json()) as DetailTopResult;
+  const detail3 = (await res3.json()) as DetailTopResult;
   const legalPerson = detail?.data?.baseInfo?.legalPerson || '';
-  const phoneList = (detail?.data?.contacts?.cellPhones || []).map((d) => d.info);
+  const contacts1 = detail?.data?.contacts?.cellPhones || [];
+  const contacts2 = detail3?.data?.contacts?.cellPhones || [];
+  const phoneList = ([...contacts1, ...contacts2] || []).map((d) => d.info);
   writeFile(path.resolve(__dirname, './data.csv'), { name, legalPerson, phone: "'" + phoneList.join(',') });
   console.log('已获取', name);
 }
