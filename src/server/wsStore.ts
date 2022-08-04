@@ -1,6 +1,8 @@
 import { delay } from '@/utils';
+import { url } from 'inspector';
 
-let wsList: { id: string; ws: WebSocket; url: string }[] = [];
+export type WsObj = { id: string; ws: WebSocket; url: string }
+let wsList: WsObj[] = [];
 
 export function getWsById(id: string) {
   return wsList.find((d) => d.id === id);
@@ -30,14 +32,9 @@ export function removeWs(id: string) {
 
 export function addWs(ws: WebSocket, info: { id: string; url: string }) {
   ws.__webSocketId__ = info.id;
-  const d = getWsById(info.id);
-  if (d) {
-    d.ws = ws;
-    // 链接断开后，自动注销
-    d.ws.addEventListener('close', () => {
-      removeWs(info.id);
-    });
-    return;
-  }
+  ws.addEventListener('close', ()=>{
+    removeWs(info.id)
+  })
+  removeWs(info.id)
   wsList = [...wsList, { ws, ...info }];
 }

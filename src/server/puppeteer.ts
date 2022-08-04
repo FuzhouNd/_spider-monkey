@@ -1,8 +1,8 @@
 import { exec } from './message';
-import { getWsById, getWs } from './wsStore';
+import { getWsById, getWs, WsObj } from './wsStore';
 import { delay } from '@/utils/index';
 
-export function createPage(url: string): Promise<{ ws: WebSocket; webSocketId: string }> {
+export function createPage(url: string): Promise<WsObj> {
   return new Promise(async (resolve, reject) => {
     const rootWs = getWs()?.ws;
     if (!rootWs) {
@@ -24,10 +24,10 @@ export function createPage(url: string): Promise<{ ws: WebSocket; webSocketId: s
       await delay(1000);
       const ws = getWsById(resWebSocketId);
       if (ws) {
-        resolve({ ws: ws.ws, webSocketId: resWebSocketId });
+        resolve(ws);
         break;
       } else if (index > Max) {
-        reject('can find ws');
+        reject('can not find ws');
         break;
       }
       index += 1;
