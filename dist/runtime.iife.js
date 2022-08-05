@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         spider-runtime
 // @namespace    http://tampermonkey.net/
-// @version      0.2.7
+// @version      0.2.8
 // @description  help control browser
 // @author       zxxzzzzz
 // @include      *
@@ -3818,15 +3818,16 @@ const spider_monkey_runtime = function() {
     });
   }
   async function initMessage() {
+    const webSocketId2 = new URL(location.href).searchParams.get("webSocketId") || window.name;
     const data = await sendMessage({
       type: MESSAGE_TYPE.init,
       content: { url: location.href },
       messageId: new Date().valueOf().toString(),
-      webSocketId: window.name
+      webSocketId: webSocketId2
     });
     if (data) {
-      webSocketId = data.webSocketId;
-      console.log("runtime init success", webSocketId);
+      const resWebSocketId = data.webSocketId;
+      console.log("runtime init success", resWebSocketId);
     } else {
       throw Error("runtime init fail");
     }

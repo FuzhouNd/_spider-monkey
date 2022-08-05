@@ -5,19 +5,22 @@ import { delay } from '@/utils/index';
 // 新创一个页面
 export function createPage(url: string, options?:{}): Promise<WsObj> {
   return new Promise(async (resolve, reject) => {
+    const parsedUrl = new URL(url)
     const rootWs = getWs()?.ws;
+    const webSocketId = new Date().valueOf().toString();
+    parsedUrl.searchParams.append('webSocketId', webSocketId)
+    url = parsedUrl.toString()
     if (!rootWs) {
       reject('createPage fail,because need root ws');
       return;
     }
     const resWebSocketId = await exec(
       rootWs,
-      ({}, url) => {
-        const webSocketId = new Date().valueOf().toString();
+      ({}, {url,webSocketId}) => {
         window.open(url, webSocketId);
         return webSocketId;
       },
-      url
+      {url,webSocketId}
     );
     const Max = 10;
     let index = 0;

@@ -37,15 +37,16 @@ function sendMessage(message: Message): Promise<DataMessage> {
 }
 
 async function initMessage() {
+  const webSocketId =  new URL(location.href).searchParams.get('webSocketId') || window.name
   const data = await sendMessage({
     type: MESSAGE_TYPE.init,
     content: { url: location.href },
     messageId: new Date().valueOf().toString(),
-    webSocketId: window.name,
+    webSocketId,
   });
   if (data) {
-    webSocketId = data.webSocketId;
-    console.log('runtime init success', webSocketId);
+    const resWebSocketId = data.webSocketId;
+    console.log('runtime init success', resWebSocketId);
   } else {
     throw Error('runtime init fail');
   }
