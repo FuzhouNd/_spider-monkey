@@ -12,7 +12,7 @@ const desc = `
 // ==UserScript==
 // @name         spider-runtime
 // @namespace    http://tampermonkey.net/
-// @version      0.2.8
+// @version      0.2.9
 // @description  help control browser
 // @author       zxxzzzzz
 // @include      *

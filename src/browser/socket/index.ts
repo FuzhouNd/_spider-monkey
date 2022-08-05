@@ -37,7 +37,7 @@ function sendMessage(message: Message): Promise<DataMessage> {
 }
 
 async function initMessage() {
-  const webSocketId =  new URL(location.href).searchParams.get('webSocketId') || window.name
+  const webSocketId = new URL(location.href).searchParams.get('webSocketId') || window.name;
   const data = await sendMessage({
     type: MESSAGE_TYPE.init,
     content: { url: location.href },
@@ -46,7 +46,7 @@ async function initMessage() {
   });
   if (data) {
     const resWebSocketId = data.webSocketId;
-    console.log('runtime init success', resWebSocketId);
+    console.log('runtime init success', 'res', resWebSocketId, 'brow', webSocketId);
   } else {
     throw Error('runtime init fail');
   }
@@ -69,8 +69,7 @@ async function onPayloadMessage() {
 
 async function initSocket() {
   if (!socket) {
-    const host = location.host
-    console.log(`ws://${host}/spider-runtime`, '123123');
+    const host = location.host;
     // @ts-ignore
     socket = new WebSocket(`wss://${host}/spider-runtime`);
     // @ts-ignore

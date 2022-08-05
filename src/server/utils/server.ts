@@ -27,7 +27,6 @@ const eventEmitter = new EventEmitter();
 app.ws('/spider-runtime', function (ws, req) {
   ws.on('message', (msg: string) => {
     const message: Message = JSON.parse(msg);
-    console.log('message', message);
     if (message.type === MESSAGE_TYPE.init) {
       // 回复运行时，后端准备ok
       const webSocketId = message.webSocketId || new Date().valueOf().toString();
