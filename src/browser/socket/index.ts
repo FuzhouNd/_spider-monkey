@@ -69,6 +69,7 @@ async function onPayloadMessage() {
 async function initSocket() {
   if (!socket) {
     const host = location.host
+    console.log(`ws://${host}/spider-runtime`, '123123');
     // @ts-ignore
     socket = new WebSocket(`ws://${host}/spider-runtime`);
     // @ts-ignore
