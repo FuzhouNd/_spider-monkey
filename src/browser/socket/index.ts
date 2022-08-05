@@ -80,7 +80,7 @@ async function initSocket() {
     socket.addEventListener('close', () => {
       //@ts-ignore
       window[VITE_EXPORT_NAME] = void 0;
-      console.log('socket close');
+      console.log(new Date().toLocaleString(), 'socket close');
     });
     return;
   }
