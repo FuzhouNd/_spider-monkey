@@ -39,6 +39,7 @@ export function send(ws: WebSocket, message: PayloadMessage): Promise<DataMessag
 }
 
 type Func<T> = (G: { R: typeof R; delay: typeof delay }, data: T) => any;
+// 在浏览器上执行代码
 export async function exec<K, T extends Func<K>>(ws: WebSocket, func: T, _data?: K): Promise<ReturnType<T>> {
   const data = await send(ws, {
     messageId: new Date().valueOf().toString(),

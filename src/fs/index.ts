@@ -47,15 +47,15 @@ export function readFile(filePath: string) {
     .map((d) => d.split(';'));
 }
 
-export function readCsv(filePath: string): Promise<unknown[]> {
-  return new Promise<unknown[]>((resolve, reject) => {
-    if(!fs.pathExistsSync(filePath)){
-      return []
+export function readCsv<T = unknown>(filePath: string, options: csv.ParserOptionsArgs = { headers: true }): Promise<T[]> {
+  return new Promise<T[]>((resolve, reject) => {
+    if (!fs.pathExistsSync(filePath)) {
+      return [];
     }
-    const re: unknown[] = [];
+    const re: T[] = [];
     _fs
       .createReadStream(filePath)
-      .pipe(csv.parse({ headers: true }))
+      .pipe(csv.parse(options))
       .on('error', (error) => reject(error))
       .on('data', (row) => re.push(row))
       .on('end', (rowCount: number) => resolve(re));

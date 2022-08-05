@@ -1,6 +1,6 @@
 // import { send } from '@/server';
-import { useCallBack } from '@/server/index';
-import { exec } from '@/server/message';
+import { useCallBack } from '@/server/utils/server';
+import { exec } from '@/server/utils/message';
 import { ExecFuncParams } from '@/browser/executor/type';
 import { range } from 'ramda';
 import { writeFile } from '@/fs';

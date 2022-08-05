@@ -246,46 +246,49 @@ async function getCDetail(comptId: number) {
 //   }
 // })();
 
-// (async () => {
-//   const urlList = readFile('./data/kaggle/url.csv').slice(1).map((d) => d[1]);
-//   let existIdList: string[] = [];
-//   if (fs.pathExistsSync('./data/kaggle/codeId.csv')) {
-//     existIdList = readFile('./data/kaggle/codeId.csv').map((d) => d[0]);
-//   }
-//   for (const url of urlList.slice(0, 500)) {
-//     const id = url.split('/').slice(-2)[0];
-//     if (existIdList.includes(id)) {
-//       console.log('exist', id);
-//       continue;
-//     }
-//     console.log(url);
-//     const data = await download(url);
-//     //  writeFile('./data/kaggle/url.csv', { date, url });
-//     fs.writeFileSync(`./data/kaggle/file/${id}.ipynb`, data);
-//     console.log('file download', id);
-//     writeFile('./data/codeId.csv', id);
-//     await delay(5 * 1000);
-//   }
-// })();
-
 (async () => {
-  const data = await readCsv('./data/kaggle/Competitions.csv');
-  const existIdList = (await readCsv('./data/kaggle/compId.csv')).map((d) => (d as { id: string }).id);
-  const fComptList = data.filter((d) => {
-    return dayjs((d as any).DeadlineDate).year() >= 2021;
-  }) as any[];
-  for (const compt of fComptList) {
-    if (existIdList.includes(compt.Id)) {
-      console.log('compet exist', compt.Subtitle, compt.Id);
+  const urlList1 = (await readCsv<{ url: string }>('./data/kaggle/url.csv')).map((d) => d.url);
+  const urlList2 = (await readCsv<{ url: string }>('./data/kaggle/url3.csv')).map((d) => d.url);
+  const urlList = [...new Set([...urlList1, ...urlList2]).values()]
+  let existIdList: string[] = [];
+  if (fs.pathExistsSync('./data/kaggle/codeId.csv')) {
+    existIdList = readFile('./data/kaggle/codeId.csv').map((d) => d[0]);
+  }
+  for (const url of urlList) {
+    const id = url.split('/').slice(-2)[0];
+    // console.log(id, existIdList);
+    if (existIdList.includes(id)) {
+      console.log('exist', id, urlList.length);
       continue;
     }
-    console.log('compet name', compt.Subtitle, compt.Id);
-    const detailList = await getCDetail(compt.Id);
-    for (const detail of detailList) {
-      const url = `https://www.kaggle.com/kernels/scriptcontent/${detail.scriptVersionId}/download`;
-      const date = detail.scriptVersionDateCreated;
-      await writeCsv('./data/kaggle/url.csv', [{ date, url, title: detail.title }]);
-    }
-    await writeCsv('./data/kaggle/compId.csv', [{ id: `${compt.Id}` }]);
+    console.log(url);
+    const data = await download(url);
+    //  writeFile('./data/kaggle/url.csv', { date, url });
+    fs.writeFileSync(`./data/kaggle/file/${id}.ipynb`, data);
+    console.log('file download', id);
+    writeFile('./data/kaggle/codeId.csv', id);
+    // await delay(5 * 1000);
   }
 })();
+
+// (async () => {
+//   const data = await readCsv('./data/kaggle/Competitions.csv');
+//   const existIdList = (await readCsv('./data/kaggle/compId.csv')).map((d) => (d as { id: string }).id);
+//   const fComptList = data.filter((d) => {
+//     return dayjs((d as any).DeadlineDate).year() >= 2021;
+//   }) as any[];
+//   for (const compt of fComptList) {
+//     if (existIdList.includes(compt.Id)) {
+//       console.log('compet exist', compt.Subtitle, compt.Id);
+//       continue;
+//     }
+//     console.log('compet name', compt.Subtitle, compt.Id);
+//     const detailList = await getCDetail(compt.Id);
+//     for (const detail of detailList) {
+//       const url = `https://www.kaggle.com/kernels/scriptcontent/${detail.scriptVersionId}/download`;
+//       const date = detail.scriptVersionDateCreated;
+//       await writeCsv('./data/kaggle/url.csv', [{ date, url, title: detail.title }]);
+//     }
+//     await writeCsv('./data/kaggle/compId.csv', [{ id: `${compt.Id}` }]);
+//   }
+// })();

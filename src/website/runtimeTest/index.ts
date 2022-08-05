@@ -1,6 +1,6 @@
 // import { send } from '@/server';
-import { useCallBack } from '@/server/index';
-import { exec } from '@/server/message';
+import { useCallBack } from '@/server/utils/server';
+import { exec } from '@/server/utils/message';
 
 
 useCallBack(async ({ ws, message }) => {

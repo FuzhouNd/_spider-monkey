@@ -2,11 +2,12 @@ import { exec } from './message';
 import { getWsById, getWs, WsObj } from './wsStore';
 import { delay } from '@/utils/index';
 
-export function createPage(url: string): Promise<WsObj> {
+// 新创一个页面
+export function createPage(url: string, options?:{}): Promise<WsObj> {
   return new Promise(async (resolve, reject) => {
     const rootWs = getWs()?.ws;
     if (!rootWs) {
-      reject(false);
+      reject('createPage fail,because need root ws');
       return;
     }
     const resWebSocketId = await exec(
@@ -18,7 +19,7 @@ export function createPage(url: string): Promise<WsObj> {
       },
       url
     );
-    const Max = 3;
+    const Max = 10;
     let index = 0;
     while (true) {
       await delay(1000);
@@ -27,7 +28,7 @@ export function createPage(url: string): Promise<WsObj> {
         resolve(ws);
         break;
       } else if (index > Max) {
-        reject('can not find ws');
+        reject('createPage fail,because can not link to that page');
         break;
       }
       index += 1;

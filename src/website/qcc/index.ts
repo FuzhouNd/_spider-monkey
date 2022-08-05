@@ -1,11 +1,11 @@
 // import { send } from '@/server';
-import { createPage } from '@/server/puppeteer';
-import { exec } from '@/server/message';
+import { createPage } from '@/server/utils/puppeteer';
+import { exec } from '@/server/utils/message';
 import { ExecFuncParams } from '@/browser/executor/type';
 import { range } from 'ramda';
 import { writeFile, readFile } from '@/fs';
 import { delay } from '@/utils';
-import { useCallback } from '@/server';
+import { useCallback } from '@/server/utils/server';
 
 const idList: string[] = readFile('./data/qcc.csv').map((d) => d[0]);
 

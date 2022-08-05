@@ -1,5 +1,4 @@
 import { delay } from '@/utils';
-import { url } from 'inspector';
 
 export type WsObj = { id: string; ws: WebSocket; url: string }
 let wsList: WsObj[] = [];
@@ -11,7 +10,7 @@ export function getAllWs() {
   return wsList;
 }
 export async function waitForWs(func: (wsObj: { id: string; ws: WebSocket; url: string }) => boolean) {
-  for (let index = 0; index < 5; index++) {
+  for (let index = 0; index < 10; index++) {
     await delay(1000);
     const ws = getAllWs().find(func);
     if (ws) {
