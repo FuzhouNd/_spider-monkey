@@ -12,7 +12,7 @@ const desc = `
 // ==UserScript==
 // @name         spider-runtime
 // @namespace    http://tampermonkey.net/
-// @version      0.2.5
+// @version      0.2.6
 // @description  help control browser
 // @author       zxxzzzzz
 // @include      *
@@ -30,7 +30,7 @@ export default defineConfig({
       formats: ['iife'],
       fileName: 'runtime',
     },
-    sourcemap: 'inline',
+    minify: false,
   },
   resolve: {
     alias: [{ find: '@/', replacement: path.resolve(__dirname, './src/') + '/' }],
