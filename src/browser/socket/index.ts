@@ -68,8 +68,9 @@ async function onPayloadMessage() {
 
 async function initSocket() {
   if (!socket) {
+    const host = location.host
     // @ts-ignore
-    socket = new WebSocket('ws://127.0.0.1:8998/spider-runtime');
+    socket = new WebSocket(`ws://${host}/spider-runtime`);
     // @ts-ignore
     window[VITE_EXPORT_NAME] = socket;
     socket.addEventListener('open', async () => {
