@@ -71,7 +71,7 @@ async function initSocket() {
     const host = location.host
     console.log(`ws://${host}/spider-runtime`, '123123');
     // @ts-ignore
-    socket = new WebSocket(`ws://${host}/spider-runtime`);
+    socket = new WebSocket(`wss://${host}/spider-runtime`);
     // @ts-ignore
     window[VITE_EXPORT_NAME] = socket;
     socket.addEventListener('open', async () => {
