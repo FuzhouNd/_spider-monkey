@@ -30,6 +30,7 @@ export default defineConfig({
       formats: ['iife'],
       fileName: 'runtime',
     },
+    sourcemap: 'inline',
   },
   resolve: {
     alias: [{ find: '@/', replacement: path.resolve(__dirname, './src/') + '/' }],
