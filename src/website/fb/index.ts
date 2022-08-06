@@ -2,6 +2,7 @@ import { useCallback, exec, createPage, store } from '@/server';
 import { delay } from '@/utils';
 import { writeCsv } from '@/fs';
 
+
 useCallback(async () => {
   const ws = await createPage('https://www.facebook.com/groups/needlefelting/members/pages');
   let allUrlList: string[] = [];
@@ -37,6 +38,9 @@ useCallback(async () => {
     await delay(30 * 1000);
     if (ws) {
       const email = await exec(ws.ws, () => {
+        setTimeout(() => {
+          window.close()
+        }, 2000);
         return (
           [...document.querySelectorAll('span > a')]
             .map((d) => {
@@ -46,7 +50,7 @@ useCallback(async () => {
             .find((d) => /[\S]+@[\S]+/g.test(d)) || ''
         );
       });
-      console.log();
+      console.log({ email, url });
       // emailList.push({ email, url });
       await writeCsv(
         './data/userUrl.csv',
