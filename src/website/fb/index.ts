@@ -29,7 +29,7 @@ useCallback(async () => {
       break;
     }
   }
-  console.log(allUrlList);
+  // console.log(allUrlList);
   let emailList = [];
   for (const url of allUrlList) {
     await createPage(`https://www.facebook.com${url}`, { noWait: true });
@@ -50,10 +50,10 @@ useCallback(async () => {
       emailList.push({ email, url });
     }
   }
-  console.log(emailList);
-  // writeCsv(
-  //   './data/userUrl.csv',
-  //   allUrlList.map((u) => ({ url: u }))
-  // );
+  // console.log(emailList);
+  writeCsv(
+    './data/userUrl.csv',
+    allUrlList.map((u) => ({ url: u }))
+  );
   // console.log(allUrlList);
 });
