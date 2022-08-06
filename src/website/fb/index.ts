@@ -46,14 +46,14 @@ useCallback(async () => {
             .find((d) => /[\S]+@[\S]+/g.test(d)) || ''
         );
       });
-      console.log({ email, url });
-      emailList.push({ email, url });
+      console.log();
+      // emailList.push({ email, url });
+      await writeCsv(
+        './data/userUrl.csv',
+        [{ email, url }]
+      );
     }
   }
   // console.log(emailList);
-  writeCsv(
-    './data/userUrl.csv',
-    allUrlList.map((u) => ({ url: u }))
-  );
   // console.log(allUrlList);
 });
