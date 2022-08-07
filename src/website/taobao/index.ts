@@ -22,76 +22,80 @@ useCallback(async () => {
     const sale = await exec(ws.ws, () => {
       return (document.querySelector('.tm-ind-sellCount .tm-indcon')?.textContent || '').replace(/[^0-9]/g, '');
     });
-    const imgSrc = await exec(ws.ws, () => {
-      return (document.querySelector('#J_ImgBooth') as HTMLImageElement)?.src || '';
+    const imgSrc =
+      (
+        await exec(ws.ws, () => {
+          return (document.querySelector('#J_ImgBooth') as HTMLImageElement)?.src || '';
+        })
+      ).split('.jpg')[0] + '.jpg';
+    const canBuy = await exec(ws.ws, () => {
+      const buyDom = document.querySelector('#J_LinkBuy');
+      if (buyDom && buyDom.parentElement) {
+        return !buyDom.parentElement.classList.contains('tb-hidden');
+      }
+      return false;
     });
-    await exec(ws.ws, async ({ delay,R }) => {
+    if (!canBuy) {
+      await exec(ws.ws,()=>{
+        setTimeout(() => {
+          window.close()
+        }, 2000);
+      })
+      writeCsv('./data/price.csv', [{ date: dayjs().format('YYYY-MM-DD HH:mm:ss'), title, url, price: 0, sale, imgSrc }]);
+      console.log('title', title, url, '暂时不能购买');
+      continue;
+    }
+    await exec(ws.ws, async ({ delay, R }) => {
       // .tm-promo-price .tm-price
-      const propsList = [...document.querySelectorAll('.tb-sku dl.tb-prop.tm-sale-prop')];
+      let propsList = [...document.querySelectorAll('.tb-sku dl.tb-prop.tm-sale-prop')];
       const liListList = propsList.map((propsDom) => {
         return [...propsDom.querySelectorAll('li')] as HTMLLIElement[];
       });
       const total = liListList.reduce((re, cur) => {
         return re * cur.length;
       }, 1);
-      const tArr = []
-      const stepArr = liListList.reduce((re,cur) => {
-        return [...re,re.slice(-1)[0]*cur.length]
-      }, [1] as number[])
+      const tArr = [];
+      const stepArr = liListList.reduce(
+        (re, cur) => {
+          return [...re, re.slice(-1)[0] * cur.length];
+        },
+        [1] as number[]
+      );
       for (let i = 0; i < total; i++) {
-        const  t = R.range(0, liListList.length).map((index) => {
-          return Math.floor(i/stepArr[index] % liListList[index].length)
-        })
-        tArr.push(t)
+        const t = R.range(0, liListList.length).map((index) => {
+          return Math.floor((i / stepArr[index]) % liListList[index].length);
+        });
+        tArr.push(t);
       }
-      let minPrice = 99999999999
+      let minPrice = 99999999999;
+      let minT: number[] = [];
       for (const t of tArr) {
         const propsList = [...document.querySelectorAll('.tb-sku dl.tb-prop.tm-sale-prop')];
         for (let index = 0; index < propsList.length; index++) {
           const propsDom = propsList[index];
-          const liList =  [...propsDom.querySelectorAll('li')] as HTMLLIElement[];
-          liList[t[index]].click()
-          await delay(500)
+          const liList = [...propsDom.querySelectorAll('li')] as HTMLLIElement[];
+          const li = liList[t[index]];
+          if (!li.classList.contains('tb-selected')) {
+            li.querySelector('a')?.click?.();
+          }
+          await delay(1000);
         }
-        const priceDom = document.querySelector('.tm-price-cur .tm-price')
-        if(priceDom){
-          const price = parseInt(priceDom.textContent || '99999999', 10)
-          console.log(t, price);
+        const _minPrice = Math.min(...[...document.querySelectorAll('.tm-price')].map((d) => parseFloat(d.textContent || '99999999999')));
+        if (_minPrice < minPrice) {
+          minPrice = _minPrice;
+          minT = t;
         }
       }
-      await delay(900 *1000)
-      // liListList.reduce((re, liList, index) => {
-      //   // [] => [[0],[1],[2]] => [[0,0],[1,0], [2,0], []]
-      //   liList.forEach(() => {
-
-      //   })
-      // }, []);
-      // const liListList = propsList.map((propsDom) => {
-      //   return ([...propsDom.querySelectorAll('li:not(.tb-selected)')] as HTMLLIElement[]).filter(
-      //     (l) => !l.classList.contains('tb-out-of-stock')
-      //   );
-      // });
-      // liListList.reduce((re, liList, index) => {
-      //   liList.map((li,index) => {
-      //     return
-      //   })
-      // }, []);
-      const selectIndex = new Array(propsList.length).fill(0);
+      propsList = [...document.querySelectorAll('.tb-sku dl.tb-prop.tm-sale-prop')];
       for (let index = 0; index < propsList.length; index++) {
-        const d = propsList[index];
-        // const liList =
-        for (let _index = 0; _index < liList.length; _index++) {
-          const li = liList[_index];
+        const propsDom = propsList[index];
+        const liList = [...propsDom.querySelectorAll('li')] as HTMLLIElement[];
+        const li = liList[minT[index]];
+        if (!li.classList.contains('tb-selected')) {
+          li.querySelector('a')?.click?.();
         }
+        await delay(1000);
       }
-      // for (const d of ) {
-
-      //   // const fl = liList.;
-      //   if (fl) {
-      //     fl.querySelector('a')?.click?.();
-      //     await delay(500);
-      //   }
-      // }
     });
     await exec(ws.ws, () => {
       const buyBtn = document.querySelector('#J_LinkBuy') as HTMLButtonElement;
