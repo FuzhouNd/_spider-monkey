@@ -25,19 +25,41 @@ useCallback(async () => {
     const imgSrc = await exec(ws.ws, () => {
       return (document.querySelector('#J_ImgBooth') as HTMLImageElement)?.src || '';
     });
-    await exec(ws.ws, async ({ delay }) => {
+    await exec(ws.ws, async ({ delay,R }) => {
       // .tm-promo-price .tm-price
       const propsList = [...document.querySelectorAll('.tb-sku dl.tb-prop.tm-sale-prop')];
       const liListList = propsList.map((propsDom) => {
-        return ([...propsDom.querySelectorAll('li:not(.tb-selected)')] as HTMLLIElement[]).filter(
-          (l) => !l.classList.contains('tb-out-of-stock')
-        );
+        return [...propsDom.querySelectorAll('li')] as HTMLLIElement[];
       });
-      liListList.reduce((re, liList, index) => {
-        liList.map((li,index) => {
-          return 
+      const total = liListList.reduce((re, cur) => {
+        return re * cur.length;
+      }, 1);
+      const tArr = []
+      const stepArr = liListList.reduce((re,cur) => {
+        return [...re,re.slice(-1)[0]*cur.length]
+      }, [1] as number[])
+      for (let i = 0; i < total; i++) {
+        const  t = R.range(0, liListList.length).map((index) => {
+          return Math.floor(i/stepArr[index] % liListList[index].length)
         })
-      }, []);
+        tArr.push(t)
+      }
+      // liListList.reduce((re, liList, index) => {
+      //   // [] => [[0],[1],[2]] => [[0,0],[1,0], [2,0], []]
+      //   liList.forEach(() => {
+
+      //   })
+      // }, []);
+      // const liListList = propsList.map((propsDom) => {
+      //   return ([...propsDom.querySelectorAll('li:not(.tb-selected)')] as HTMLLIElement[]).filter(
+      //     (l) => !l.classList.contains('tb-out-of-stock')
+      //   );
+      // });
+      // liListList.reduce((re, liList, index) => {
+      //   liList.map((li,index) => {
+      //     return
+      //   })
+      // }, []);
       const selectIndex = new Array(propsList.length).fill(0);
       for (let index = 0; index < propsList.length; index++) {
         const d = propsList[index];
