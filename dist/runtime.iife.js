@@ -3799,7 +3799,6 @@ const spider_monkey_runtime = function() {
           return;
         }
         if (message.type === MESSAGE_TYPE.init || message.type === MESSAGE_TYPE.payload) {
-          socket.send(JSON.stringify(message));
           const li = (evt) => {
             const data = JSON.parse(evt.data);
             if ((data == null ? void 0 : data.messageId) === message.messageId) {
@@ -3807,9 +3806,12 @@ const spider_monkey_runtime = function() {
               if (socket) {
                 socket == null ? void 0 : socket.removeEventListener("message", li);
               }
+            } else {
+              reject2(Error("\u521D\u59CB\u5316\u5931\u8D25"));
             }
           };
           socket.addEventListener("message", li);
+          socket.send(JSON.stringify(message));
           return;
         }
         return;
@@ -3836,6 +3838,7 @@ const spider_monkey_runtime = function() {
     if (socket) {
       const li = async (evt) => {
         const message = JSON.parse(evt.data);
+        console.log(message, "message");
         if (message.type === MESSAGE_TYPE.payload) {
           const data = await execPayload(message.data);
           sendMessage({ type: MESSAGE_TYPE.data, data, messageId: message.messageId, webSocketId });

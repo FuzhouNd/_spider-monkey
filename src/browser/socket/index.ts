@@ -17,7 +17,6 @@ function sendMessage(message: Message): Promise<DataMessage> {
         return;
       }
       if (message.type === MESSAGE_TYPE.init || message.type === MESSAGE_TYPE.payload) {
-        socket.send(JSON.stringify(message));
         const li = (evt: MessageEvent) => {
           const data = JSON.parse(evt.data);
           if (data?.messageId === message.messageId) {
@@ -25,9 +24,12 @@ function sendMessage(message: Message): Promise<DataMessage> {
             if (socket) {
               socket?.removeEventListener('message', li);
             }
+          }else {
+            reject(Error('初始化失败'))
           }
         };
         socket.addEventListener('message', li);
+        socket.send(JSON.stringify(message));
         return;
       }
       return;
@@ -56,6 +58,7 @@ async function onPayloadMessage() {
   if (socket) {
     const li = async (evt) => {
       const message: PayloadMessage = JSON.parse(evt.data);
+      console.log(message, 'message');
       if (message.type === MESSAGE_TYPE.payload) {
         const data = await execPayload(message.data);
         sendMessage({ type: MESSAGE_TYPE.data, data, messageId: message.messageId, webSocketId });

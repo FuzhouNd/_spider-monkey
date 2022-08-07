@@ -104,7 +104,9 @@ useCallback(async () => {
       }
     });
     await delay(2000);
+    console.log('wait');
     const fWs = getWsById(ws.id) ? ws : await waitForWs((w) => w.url.includes('https://buy.tmall.com/order/confirm_order'));
+    console.log('wait end');
     await delay(1000);
     // console.log(getAllWs(), fWs);
     if (!fWs) {
