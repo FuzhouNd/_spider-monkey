@@ -44,6 +44,22 @@ useCallback(async () => {
         })
         tArr.push(t)
       }
+      let minPrice = 99999999999
+      for (const t of tArr) {
+        const propsList = [...document.querySelectorAll('.tb-sku dl.tb-prop.tm-sale-prop')];
+        for (let index = 0; index < propsList.length; index++) {
+          const propsDom = propsList[index];
+          const liList =  [...propsDom.querySelectorAll('li')] as HTMLLIElement[];
+          liList[t[index]].click()
+          await delay(500)
+        }
+        const priceDom = document.querySelector('.tm-price-cur .tm-price')
+        if(priceDom){
+          const price = parseInt(priceDom.textContent || '99999999', 10)
+          console.log(t, price);
+        }
+      }
+      await delay(900 *1000)
       // liListList.reduce((re, liList, index) => {
       //   // [] => [[0],[1],[2]] => [[0,0],[1,0], [2,0], []]
       //   liList.forEach(() => {

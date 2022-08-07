@@ -3848,8 +3848,7 @@ const spider_monkey_runtime = function() {
   }
   async function initSocket() {
     if (!socket) {
-      const host = location.host;
-      socket = new WebSocket(`wss://${host}/spider-runtime`);
+      socket = new WebSocket(`ws://127.0.0.1:8998/spider-runtime`);
       window[VITE_EXPORT_NAME] = socket;
       socket.addEventListener("open", async () => {
         await initMessage();
