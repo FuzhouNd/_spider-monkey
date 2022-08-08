@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@types/cookie': ^0.5.1
   '@types/cors': ^2.8.12
   '@types/download': ^8.0.1
   '@types/express': ^4.17.13
@@ -12,6 +13,7 @@ specifiers:
   '@types/pdf-parse': ^1.1.1
   '@types/ramda': ^0.28.15
   '@types/yargs': ^17.0.10
+  cookie: ^0.5.0
   cors: ^2.8.5
   dayjs: ^1.11.4
   download: ^8.0.0
@@ -34,6 +36,7 @@ specifiers:
   yargs: ^17.5.1
 
 dependencies:
+  '@types/cookie': 0.5.1
   '@types/cors': registry.npmmirror.com/@types/cors/2.8.12
   '@types/download': 8.0.1
   '@types/express': 4.17.13
@@ -45,6 +48,7 @@ dependencies:
   '@types/pdf-parse': 1.1.1
   '@types/ramda': registry.npmmirror.com/@types/ramda/0.28.15
   '@types/yargs': registry.npmmirror.com/@types/yargs/17.0.10
+  cookie: 0.5.0
   cors: 2.8.5
   dayjs: registry.npmmirror.com/dayjs/1.11.4
   download: 8.0.0
@@ -133,6 +137,10 @@ packages:
     resolution: {integrity: sha512-cdeYyv4KWoEgpBISTxWvqYsVy444DOqehiF3fM3ne10AmJ62RSyNkUnxMJXHQWRQQX2eR94m5y1IZyDwBjV9FQ==}
     dependencies:
       '@types/node': 18.6.1
+    dev: false
+
+  /@types/cookie/0.5.1:
+    resolution: {integrity: sha512-COUnqfB2+ckwXXSFInsFdOAWQzCCx+a5hq2ruyj+Vjund94RJQd4LG2u9hnvJrTgunKAaax7ancBYlDrNYxA0g==}
     dev: false
 
   /@types/decompress/4.2.4:
