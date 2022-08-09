@@ -138,8 +138,8 @@ async function getAllZhouji() {
               日期: fromDate,
               所属集团: '洲际',
               酒店名称: name,
-              房型: roomName,
-              官网无早会员价: price.toFixed(2),
+              保底房型: roomName,
+              官网会员价: price.toFixed(2),
               我方报价: (price < 1000
                 ? price * 0.95 + 20
                 : price < 2000
@@ -151,7 +151,7 @@ async function getAllZhouji() {
             };
           });
           return R.pipe(
-            R.groupBy((a: typeof ppList[0]) => `${a.官网无早会员价}`),
+            R.groupBy((a: typeof ppList[0]) => `${a.官网会员价}`),
             R.toPairs,
             R.map((d) => (d[1] as any)[0])
           )(ppList);
@@ -230,8 +230,8 @@ async function getAllWanHao() {
           日期: dayjs(from).format('YYYY-MM-DD'),
           所属集团: '万豪',
           酒店名称: name,
-          房型: p.name,
-          官网无早会员价: basePrice.toFixed(2),
+          保底房型: p.name,
+          官网会员价: basePrice.toFixed(2),
           我方报价: (basePrice < 1000
             ? basePrice * 0.95 + 20
             : basePrice < 2000
