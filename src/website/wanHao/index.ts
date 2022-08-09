@@ -3,15 +3,20 @@ import fs from 'fs-extra';
 import { JSDOM } from 'jsdom';
 import dayjs from 'dayjs';
 import { SearchData, DetailData, SearchData1 } from './type';
-import { writeCsv } from '@/fs';
+import { readCsv, writeCsv } from '@/fs';
 import { delay } from '@/utils';
 import puppeteer from 'puppeteer-core';
 import * as R from 'ramda';
-import { json } from 'stream/consumers';
 
-async function getAllWanZhou() {
+async function getAllZhouji() {
+  const existDate = (await readCsv(`./data/hotel-${dayjs().format('YYYY-MM-DD')}.csv`))
+    .filter((d: any) => d['所属集团'] === '洲际')
+    .map((d: any) => d['日期']);
   for (let index = 0; index < 31; index++) {
     const fromDate = dayjs().add(index, 'day').format('YYYY-MM-DD');
+    if (existDate.includes(fromDate)) {
+      continue;
+    }
     const toDate = dayjs()
       .add(index + 1, 'day')
       .format('YYYY-MM-DD');
@@ -55,9 +60,9 @@ async function getAllWanZhou() {
       method: 'POST',
     });
     const searchData = (await res.json()) as SearchData1;
+    let allHotelDetail: any[] = [];
     for (const hotel of searchData.hotels) {
       const id = hotel.hotelMnemonic;
-      const price = hotel.lowestCashOnlyCost?.baseAmount || 0;
       const res = await fetch(
         `https://apis.ihg.com.cn/hotels/v1/profiles/${id}/details?fieldset=brandInfo,reviews,mediaCategories,location,tax,parking,facilities,profile,address,contact,renovationAlerts.active,stripes,policies,marketing`,
         {
@@ -119,7 +124,7 @@ async function getAllWanZhou() {
       );
       const searchData = (await res2.json()) as SearchData;
       if ((searchData as any).code) {
-        console.log('房间已满', name);
+        console.log('房间已满', fromDate, name);
         continue;
       }
       // {} as {[key:string]:SearchData['hotels'][0]['productDefinitions']}
@@ -152,21 +157,27 @@ async function getAllWanZhou() {
           )(ppList);
         })
         .flat();
-      console.log('已获取酒店', name);
-      writeCsv('./data/hotel.csv', priceList);
+      allHotelDetail = allHotelDetail.concat(priceList);
+      console.log('已获取酒店', fromDate, name);
     }
+    writeCsv(`./data/hotel-${dayjs().format('YYYY-MM-DD')}.csv`, allHotelDetail);
+    console.log('已获取完', fromDate, '洲际酒店');
     await delay(5 * 1000);
   }
 }
 
 async function getAllWanHao() {
   const bro = await puppeteer.launch({
-    executablePath: 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
     headless: false,
     defaultViewport: { width: 1920, height: 1080 },
   });
+  const existDate = (await readCsv(`./data/hotel-${dayjs().format('YYYY-MM-DD')}.csv`)).map((d: any) => d['日期']);
   for (let index = 0; index < 31; index++) {
     const from = dayjs().add(index, 'day').startOf('day').valueOf();
+    if (existDate.includes(dayjs(from).format('YYYY-MM-DD'))) {
+      continue;
+    }
     const to = dayjs()
       .add(index + 1, 'day')
       .startOf('day')
@@ -179,8 +190,8 @@ async function getAllWanHao() {
     const cal = await page.$('#searchform_copy-pc-calendar .cmp-searchfilters__field-input');
     await cal?.click?.();
     await page.waitForTimeout(1000);
-    const fromB = await page.$(`#searchform_copy-pc-calendar [time="${from}"] a`);
-    const toB = await page.$(`#searchform_copy-pc-calendar [time="${to}"] a`);
+    const fromB = await page.$(`#searchform_copy-pc-calendar .toMonth[time="${from}"] a`);
+    const toB = await page.$(`#searchform_copy-pc-calendar .toMonth[time="${to}"] a`);
     await fromB?.click?.();
     await toB?.click?.();
     const sureB = await page.$(`#searchform_copy-pc-calendar .apply-btn`);
@@ -190,12 +201,13 @@ async function getAllWanHao() {
     await searchB?.click?.();
     await page.waitForTimeout(1000);
     await page.waitForNavigation();
+    await page.waitForTimeout(2000);
     const hrefList = await page.$$eval('.t-price-btn', (l) => l.map((d) => d.getAttribute('href')));
+    let allDetailList: any[] = [];
     for (const href of hrefList) {
-      const url = new URL(href||'', 'https://www.marriott.com.cn')
-      url.searchParams.set('showFullPrice', true)
-      const fullHref =  url.toString();
-      console.log(fullHref);
+      const url = new URL(href || '', 'https://www.marriott.com.cn');
+      url.searchParams.set('showFullPrice', 'true');
+      const fullHref = url.toString();
       await page.goto(fullHref, { waitUntil: 'load' });
       const priceList = await page.$$eval('.room-rate-results', (l) => {
         return l.map((d) => {
@@ -230,15 +242,18 @@ async function getAllWanHao() {
           ).toFixed(2),
         };
       });
-      console.log(detailList);
-      await writeCsv('./data/wangao.csv', detailList);
+      allDetailList = allDetailList.concat(detailList);
+      console.log(name, dayjs(from).format('YYYY-MM-DD'), '万豪');
     }
+    await writeCsv(`./data/hotel-${dayjs().format('YYYY-MM-DD')}.csv`, allDetailList);
+    console.log('已获取完', dayjs(from).format('YYYY-MM-DD'), '万豪酒店');
   }
+  await bro.close();
 }
 
 (async () => {
-  await getAllWanHao()
-  // await getAllWanZhou()
+  await getAllWanHao();
+  await getAllZhouji();
   // const data = await getWanZhou(dayjs().valueOf());
   // console.log(data);
   // await getAllWanHao();
