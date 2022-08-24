@@ -102,8 +102,7 @@ function combine() {
           // 本店商品ID_640139791264
           retA.id = str.split('_')[1];
         }
-        if (index === 3) {
-          // 本店商品ID_640139791264
+        if (index === 3) { 
           retA.date = str.split('_')[0];
         }
       });
