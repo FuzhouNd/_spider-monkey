@@ -11,6 +11,7 @@ import dayOfYear from 'dayjs/plugin/dayOfYear';
 import * as R from 'ramda';
 import glob from 'glob';
 import path from 'path';
+import fs from 'fs-extra';
 
 dayjs.extend(dayOfYear);
 
@@ -79,11 +80,15 @@ useCallback(async () => {
     }
   }
   console.log('获取完毕');
+  await delay(5000)
   combine();
   console.log('csv文件合并完毕');
 });
 
 function combine() {
+  if (fs.pathExistsSync('./data/combine.csv')) {
+    fs.rmSync('./data/combine.csv');
+  }
   glob
     .sync('./data/source/*.csv', { absolute: true })
     .sort((a, b) => {
@@ -102,7 +107,7 @@ function combine() {
           // 本店商品ID_640139791264
           retA.id = str.split('_')[1];
         }
-        if (index === 3) { 
+        if (index === 3) {
           retA.date = str.split('_')[0];
         }
       });
