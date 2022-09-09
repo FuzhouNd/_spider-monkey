@@ -37,6 +37,7 @@
     "pdf-parse": "^1.1.1",
     "pdfjs": "^2.4.7",
     "puppeteer": "^16.2.0",
+    "puppeteer-cluster": "^0.23.0",
     "puppeteer-core": "^15.5.0",
     "puppeteer-extra": "^3.3.4",
     "puppeteer-extra-plugin-stealth": "^2.11.1",

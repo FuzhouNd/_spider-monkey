@@ -27,6 +27,7 @@ specifiers:
   pdf-parse: ^1.1.1
   pdfjs: ^2.4.7
   puppeteer: ^16.2.0
+  puppeteer-cluster: ^0.23.0
   puppeteer-core: ^15.5.0
   puppeteer-extra: ^3.3.4
   puppeteer-extra-plugin-stealth: ^2.11.1
@@ -65,6 +66,7 @@ dependencies:
   pdf-parse: 1.1.1
   pdfjs: registry.npmmirror.com/pdfjs/2.4.7
   puppeteer: 16.2.0
+  puppeteer-cluster: 0.23.0_puppeteer@16.2.0
   puppeteer-core: registry.npmmirror.com/puppeteer-core/15.5.0
   puppeteer-extra: 3.3.4_wzbcxgq33aln4ss6lay7eg7pxa
   puppeteer-extra-plugin-stealth: 2.11.1_puppeteer-extra@3.3.4
@@ -1957,6 +1959,17 @@ packages:
   /punycode/2.1.1:
     resolution: {integrity: sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==}
     engines: {node: '>=6'}
+    dev: false
+
+  /puppeteer-cluster/0.23.0_puppeteer@16.2.0:
+    resolution: {integrity: sha512-108terIWDzPrQopmoYSPd5yDoy3FGJ2dNnoGMkGYPs6xtkdhgaECwpfZkzaRToMQPZibUOz0/dSSGgPEdXEhkQ==}
+    peerDependencies:
+      puppeteer: '>=1.5.0'
+    dependencies:
+      debug: 4.3.4
+      puppeteer: 16.2.0
+    transitivePeerDependencies:
+      - supports-color
     dev: false
 
   /puppeteer-extra-plugin-stealth/2.11.1_puppeteer-extra@3.3.4:
