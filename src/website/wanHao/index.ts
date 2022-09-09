@@ -130,31 +130,29 @@ async function getAllZhouji() {
       // {} as {[key:string]:SearchData['hotels'][0]['productDefinitions']}
       const priceList = searchData.hotels
         .map((h) => {
-          const ppList = h.rateDetails.offers.map((o) => {
-            const code = o.productUses[0].inventoryTypeCode;
-            const roomName = h.productDefinitions.find((d) => d.inventoryTypeCode === code)?.inventoryTypeName || '';
-            const price = parseFloat(o.productUses[0].rates?.totalRate?.amountAfterTax || '0');
-            return {
-              日期: fromDate,
-              所属集团: '洲际',
-              酒店名称: name,
-              保底房型: roomName,
-              官网会员价: price.toFixed(2),
-              我方报价: (price < 1000
-                ? price * 0.95 + 20
-                : price < 2000
-                ? price * 0.95 + 10
-                : price < 3000
-                ? price * 0.95
-                : price * 0.94
-              ).toFixed(2),
-            };
-          });
-          return R.pipe(
-            R.groupBy((a: typeof ppList[0]) => `${a.官网会员价}`),
-            R.toPairs,
-            R.map((d) => (d[1] as any)[0])
-          )(ppList);
+          const ppList = h.rateDetails.offers
+            .filter((d) => d.ratePlanCode === 'IGCOR')
+            .map((o) => {
+              const code = o.productUses[0].inventoryTypeCode;
+              const roomName = h.productDefinitions.find((d) => d.inventoryTypeCode === code)?.inventoryTypeName || '';
+              const price = parseFloat(o.productUses[0].rates?.totalRate?.amountBeforeTax || '0') * 0.92;
+              return {
+                日期: fromDate,
+                所属集团: '洲际',
+                酒店名称: name,
+                保底房型: roomName,
+                官网会员价: price.toFixed(2),
+                我方报价: (price < 1000
+                  ? price * 0.95 + 20
+                  : price < 2000
+                  ? price * 0.95 + 10
+                  : price < 3000
+                  ? price * 0.95
+                  : price * 0.94
+                ).toFixed(2),
+              };
+            });
+          return ppList
         })
         .flat();
       allHotelDetail = allHotelDetail.concat(priceList);
@@ -252,7 +250,7 @@ async function getAllWanHao() {
 }
 
 (async () => {
-  await getAllWanHao();
+  // await getAllWanHao();
   await getAllZhouji();
   // const data = await getWanZhou(dayjs().valueOf());
   // console.log(data);
