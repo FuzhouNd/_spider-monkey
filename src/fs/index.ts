@@ -50,8 +50,7 @@ export function readFile(filePath: string) {
 export function readCsv<T = unknown>(filePath: string, options: csv.ParserOptionsArgs = { headers: true }): Promise<T[]> {
   return new Promise<T[]>((resolve, reject) => {
     if (!fs.pathExistsSync(filePath)) {
-      resolve([]);
-      return
+      return [];
     }
     const re: T[] = [];
     _fs

@@ -5,8 +5,12 @@ import dayjs from 'dayjs';
 import { SearchData, DetailData, SearchData1 } from './type';
 import { readCsv, writeCsv } from '@/fs';
 import { delay } from '@/utils';
-import puppeteer from 'puppeteer-core';
+// import puppeteer from 'puppeteer-core';
 import * as R from 'ramda';
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+// add stealth plugin and use defaults (all evasion techniques)
+puppeteer.use(StealthPlugin());
 
 async function getAllZhouji() {
   const existDate = (await readCsv(`./data/hotel-${dayjs().format('YYYY-MM-DD')}.csv`))
@@ -167,10 +171,11 @@ async function getAllZhouji() {
 async function getAllWanHao() {
   const bro = await puppeteer.launch({
     executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
-    headless: false,
+    headless: true,
     defaultViewport: { width: 1920, height: 1080 },
   });
   const existDate = (await readCsv(`./data/hotel-${dayjs().format('YYYY-MM-DD')}.csv`)).map((d: any) => d['日期']);
+  const page = await bro.newPage();
   for (let index = 0; index < 31; index++) {
     const from = dayjs().add(index, 'day').startOf('day').valueOf();
     if (existDate.includes(dayjs(from).format('YYYY-MM-DD'))) {
@@ -180,8 +185,7 @@ async function getAllWanHao() {
       .add(index + 1, 'day')
       .startOf('day')
       .valueOf();
-    const page = await bro.newPage();
-    await page.goto('https://www.marriott.com.cn/default.mi', { waitUntil: 'load' });
+    await page.goto('https://www.marriott.com.cn/default.mi', { waitUntil: 'load', timeout: 60000 });
     await page.waitForTimeout(3000);
     const input = await page.$('#searchform_copy_destination > div.search_content > input');
     await input?.type('Qingdao, Shandong, China');
@@ -198,7 +202,7 @@ async function getAllWanHao() {
     const searchB = await page.$('#searchform_copy-cnsite-searchform .search_button');
     await searchB?.click?.();
     await page.waitForTimeout(1000);
-    await page.waitForNavigation();
+    await page.waitForNavigation({ waitUntil: 'load' });
     await page.waitForTimeout(2000);
     const hrefList = await page.$$eval('.t-price-btn', (l) => l.map((d) => d.getAttribute('href')));
     let allDetailList: any[] = [];
@@ -206,7 +210,7 @@ async function getAllWanHao() {
       const url = new URL(href || '', 'https://www.marriott.com.cn');
       url.searchParams.set('showFullPrice', 'true');
       const fullHref = url.toString();
-      await page.goto(fullHref, { waitUntil: 'load' });
+      await page.goto(fullHref, { waitUntil: 'load', timeout: 60000 });
       const priceList = await page.$$eval('.room-rate-results', (l) => {
         return l.map((d) => {
           const name = d.querySelector('.l-display-none h3.l-margin-none')?.textContent || '';
@@ -252,7 +256,4 @@ async function getAllWanHao() {
 (async () => {
   // await getAllWanHao();
   await getAllZhouji();
-  // const data = await getWanZhou(dayjs().valueOf());
-  // console.log(data);
-  // await getAllWanHao();
 })();
