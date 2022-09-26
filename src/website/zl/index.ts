@@ -28,11 +28,15 @@ puppeteer.use(StealthPlugin());
 
   await cluster.task(async ({ page, data }) => {
     await page.goto(data['链接'], { waitUntil: 'load' });
-    await page.waitForTimeout(4000);
+    await page.waitForTimeout(10000);
     const clickList = await page.$$('.callerCompany span');
+    let delay = 60000
+    if(clickList.length >= 3){
+      delay = 30000
+    }
     for (const sp of clickList) {
       await sp.click();
-      await page.waitForTimeout(4000);
+      await page.waitForTimeout(delay);
       const pages = await page.browser().pages();
       const npage = pages.find((d) => d.url().includes('company'));
       let address = '';
