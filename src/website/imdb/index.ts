@@ -14,86 +14,38 @@ import { movieList } from './data';
 puppeteer.use(StealthPlugin());
 
 (async () => {
-  const existList = await readCsv('./data/mm.csv')
   const cluster = await Cluster.launch({
     puppeteer,
     concurrency: Cluster.CONCURRENCY_CONTEXT,
-    maxConcurrency: 1,
-    puppeteerOptions: {
-      executablePath: 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
-      headless: false,
-    },
+    maxConcurrency: 2,
   });
-  await cluster.task(async ({ page, data: movie }) => {
-    const mvUrl = `https://www.imdb.com/find?q=${encodeURIComponent(movie[2])}&ref_=nv_sr_sm`;
-    await page.goto(mvUrl, { waitUntil: 'load' });
-    const linkList = await page.$$eval('.result_text', (ll) =>
-      ll.map((l) => ({ title: l.textContent || '', link: l.querySelector('a')?.href || '' }))
-    );
+  const reviewIdList:string[] = []
+  await cluster.task(async ({ page, data: {url, movie} }) => {
+    await page.goto(url);
+    const linkHref = await page.$eval('.findList tr .result_text a', (l) => l.getAttribute('href'));
     // https://www.imdb.com/title/tt13462900/?ref_=fn_al_tt_1
-    const matchedMov = linkList
-      .map((link) => {
-        const id = link.link?.match(/tt[0-9]+/)?.[0] || '';
-        const year = parseInt(link.title.match(/([0-9]+)/)?.[1] || '', 10);
-        return { id, year };
-      })
-      .find((mov) => {
-        if (Number.isNaN(mov.year)) {
-          return false;
-        }
-        const sourceYear = parseInt(movie[1].split('.')[0], 10);
-        return Math.abs(mov.year - sourceYear) < 5;
-      });
-    if (!matchedMov?.id) {
-      console.log('找不到', movie, linkList);
+    const id = linkHref?.match(/tt[0-9]+/)?.[0] || '';
+    if (!id) {
       return;
-    } else {
-      // console.log(matchedMov);
     }
     // www.imdb.com/title/tt13462900/reviews?ref_=tt_urv
-    await page.goto(`https://www.imdb.com/title/${matchedMov?.id}/reviews/?ref_=fn_al_tt_1`, { waitUntil: 'load' });
-    await page.waitForTimeout(4000);
-    const title = (await page.$eval('[itemprop="name"]', (l) => l.textContent || '')).replace(/[\r\n]/g, '').replace(/[\s]+(?![\S]+)/g, '');
-    while (true) {
-      await page.waitForTimeout(4000);
-      const btn = await page.$('.ipl-load-more__button');
-      if(!btn){
-        break
+    await page.goto(`https://www.imdb.com/title/${id}/?ref_=fn_al_tt_1`);
+    const containerList = await page.$$('.lister-list .review-container')
+    containerList.forEach(async (c) => {
+      const urlId = await page.$eval('.ipl-ratings-bar + a', l => l.getAttribute('href')) || '';
+      if(!reviewIdList.includes(urlId)){
+        const text = await page.$eval('.content .text', l => l.textContent || '');
+        // zhTitle,title,cast,year,sourceYear,comment
+        writeCsv('./mm.csv', {
+          zhTitle:movie[0],title,cast,year,sourceYear,comment
+        })
       }
-      const isDisabled = await page.$eval('.ipl-load-more__button', l => l&&getComputedStyle(l).display === 'none')
-      if (!isDisabled) {
-        await btn.click();
-      } else {
-        break;
-      }
-    }
-    const containerList = await page.$$('.lister-list .review-container');
-    console.log(title, containerList.length);
-
-    for (const container of containerList) {
-      const text = await container.$eval('.content .text', (l) => l.textContent || '');
-      // zhTitle,title,cast,year,sourceYear,comment
-      await writeCsv('./data/mm.csv', [
-        {
-          zhTitle: movie[0],
-          title,
-          cast: '',
-          year: matchedMov?.year,
-          sourceYear: movie[1],
-          comment: text.replace(/[\r\n]/g, ''),
-        },
-      ]);
-    }
+    })
     // Store screenshot, do something else
   });
-  for (const movie of movieList) {
-    if(!existList.some(e => e.zhTitle === movie[0])){
-      cluster.queue(movie);
-    } else {
-      console.log('jump', movie);
-    }
-  }
 
+  cluster.queue('http://www.google.com/');
+  cluster.queue('http://www.wikipedia.org/');
   // many more pages
 
   await cluster.idle();

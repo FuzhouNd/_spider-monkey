@@ -57,7 +57,7 @@ export const movieList = [
   [`冰封重生之门`, `2014.4.25`, `Iceman`],
   [`功夫丛林`, `2014.10.31`, `Kung Fu Jungle`],
   [`港囧`, `2015.09.25`, `Lost in Hong Kong`],
-  [`夏洛特烦恼`, `2015.10.09`, `Goodbye Mr. Loser`],
+  [`夏洛特烦恼`, `2015.10.09`, `Goodbye Mr.Loser`],
   [`老炮儿`, `2015.12.24`, `Mr.Six`],
   [`狼图腾`, `2015.09.11`, `Wolf Totem`],
   [`恶棍天使`, `2015.12.31`, `Devil and Angel`],
