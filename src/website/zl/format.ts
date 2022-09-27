@@ -14,7 +14,7 @@ import browser from '@/browser';
 puppeteer.use(StealthPlugin());
 
 (async () => {
-  const sourceData = await readCsv('./data/zl.csv');
+  const sourceData = await readCsv('./data/JiangSu.csv');
   let cTitle = '';
   let ii = 0;
   const _data = sourceData.map((data: any) => {

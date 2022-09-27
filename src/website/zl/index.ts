@@ -4,6 +4,7 @@ import { JSDOM } from 'jsdom';
 import dayjs from 'dayjs';
 import { readCsv, writeCsv } from '@/fs';
 import { delay } from '@/utils';
+import path from 'path';
 // import puppeteer from 'puppeteer-core';
 import * as R from 'ramda';
 import puppeteer from 'puppeteer-extra';
@@ -14,25 +15,25 @@ import browser from '@/browser';
 puppeteer.use(StealthPlugin());
 
 (async () => {
-  const sourceData = await readCsv('./data/re.csv');
   const cluster = await Cluster.launch({
     puppeteer,
     concurrency: Cluster.CONCURRENCY_PAGE,
     maxConcurrency: 1,
+    timeout: 9999999,
+    monitor: true,
     puppeteerOptions: {
-      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
-      headless: true,
-      userDataDir: 'C:/Users/zxx/AppData/Local/Google/Chrome/User Data/Default',
+      executablePath: 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
+      headless: false,
     },
   });
 
   await cluster.task(async ({ page, data }) => {
     await page.goto(data['链接'], { waitUntil: 'load' });
-    await page.waitForTimeout(10000);
+    await page.waitForTimeout(6000);
     const clickList = await page.$$('.callerCompany span');
-    let delay = 60000
-    if(clickList.length >= 3){
-      delay = 30000
+    let delay = 30000;
+    if (clickList.length >= 3) {
+      delay = 20000;
     }
     for (const sp of clickList) {
       await sp.click();
@@ -55,10 +56,9 @@ puppeteer.use(StealthPlugin());
         total = vl[1];
         support = vl[2];
         concatList = await npage.$$eval('[class="personCon"]', (dl) => dl.map((d) => d.textContent || ''));
-        await npage.close();
-        await writeCsv('./data/zl.csv', [
+        await writeCsv('./data/JiangSu.csv', [
           {
-            ...R.map(d => d.replace(/[\n]+/g, ' '), data),
+            ...R.map((d) => d.replace(/[\r\n]+/g, ' '), data),
             中标公司: companyName,
             公司地址: address,
             招标数量: count,
@@ -67,7 +67,8 @@ puppeteer.use(StealthPlugin());
             中标联系人: concatList,
           },
         ]);
-        console.log({ companyName, address, count, total, support, concatList });
+        // console.log({ companyName, address, count, total, support, concatList });
+        await npage.close();
       }
     }
 
@@ -79,16 +80,19 @@ puppeteer.use(StealthPlugin());
     const tab = await page.$('div.tab:nth-child(2)');
     if (tab) {
       await tab.click();
-      // const inp = await page.$('[placeholder="请输入手机号"]');
+      const inp = await page.$('[placeholder="请输入手机号"]');
+      await inp?.type('13002558195');
       // await inp?.$eval?.('input', d => d.value = '')
       const inp2 = await page.$('[type="password"]');
+      await inp2?.type('qwe123456');
       const btn = await page.$('[class="registerBtn"] button');
       await btn?.click?.();
       await page.waitForTimeout(4000);
     }
   });
-  for (const data of sourceData.slice(47)) {
-    cluster.queue(data);
+  const sourceData = (await readCsv(path.resolve(__dirname, './reJS.csv'))) as any[];
+  for (const data of sourceData) {
+    cluster.queue({ url: data['公告标题'], ...data });
   }
   // many more pages
 
