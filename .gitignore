@@ -10,6 +10,7 @@ node_modules
 dist-ssr
 *.local
 pnpm-lock.yaml
+kaggle
 
 # Editor directories and files
 .vscode/*
