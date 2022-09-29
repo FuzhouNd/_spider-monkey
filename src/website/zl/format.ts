@@ -14,7 +14,7 @@ import browser from '@/browser';
 puppeteer.use(StealthPlugin());
 
 (async () => {
-  const sourceData = await readCsv('./data/anHui.csv');
+  const sourceData = await readCsv('./data/zheJiang.csv');
   let cTitle = '';
   let ii = 0;
   const _data = sourceData.map((data: any) => {
@@ -29,5 +29,5 @@ puppeteer.use(StealthPlugin());
     data['中标金额（元）'] = v
     return data
   });
-  await writeCsv('./data/anHui-format.csv', _data)
+  await writeCsv('./data/zheJiang-format.csv', _data)
 })();
