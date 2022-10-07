@@ -55,10 +55,8 @@ puppeteer.use(StealthPlugin());
       const fr = frames.find((f) => f._name === 'contentIframe');
       if (fr) {
         const inp = await fr.$('[name="username"]');
-        await inp?.type('15679233619');
         // await inp?.$eval?.('input', d => d.value = '')
         const inp2 = await fr.$('[name="password"]');
-        await inp2?.type('jxlgdx6221SJQ');
         const btn = await fr.$('.login-button-container span');
         await btn?.click?.();
         await delay(4000);
