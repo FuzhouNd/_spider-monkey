@@ -81,10 +81,8 @@ puppeteer.use(StealthPlugin());
     if (tab) {
       await tab.click();
       const inp = await page.$('[placeholder="请输入手机号"]');
-      await inp?.type('13002558195');
       // await inp?.$eval?.('input', d => d.value = '')
       const inp2 = await page.$('[type="password"]');
-      await inp2?.type('qwe123456');
       const btn = await page.$('[class="registerBtn"] button');
       await btn?.click?.();
       await page.waitForTimeout(4000);
