@@ -22,7 +22,7 @@ puppeteer.use(StealthPlugin());
     timeout: 9999999,
     monitor: true,
     puppeteerOptions: {
-      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+      executablePath: 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
       headless: true,
     },
   });
@@ -56,7 +56,7 @@ puppeteer.use(StealthPlugin());
         total = vl[1];
         support = vl[2];
         concatList = await npage.$$eval('[class="personCon"]', (dl) => dl.map((d) => d.textContent || ''));
-        await writeCsv('./data/zheJiang.csv', [
+        await writeCsv('./data/heNan.csv', [
           {
             ...R.map((d) => d.replace(/[\r\n]+/g, ' '), data),
             中标公司: companyName,
@@ -90,7 +90,7 @@ puppeteer.use(StealthPlugin());
       await page.waitForTimeout(4000);
     }
   });
-  const sourceData = (await readCsv(path.resolve(__dirname, './zheJiang.csv'))) as any[];
+  const sourceData = (await readCsv(path.resolve(__dirname, './heNan.csv'))) as any[];
   for (const data of sourceData) {
     cluster.queue({ url: data['公告标题'], ...data });
   }

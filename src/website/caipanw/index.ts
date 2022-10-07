@@ -11,7 +11,7 @@ import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import { Cluster } from 'puppeteer-cluster';
 import browser from '@/browser';
-import { url1 } from './data';
+import { url1, url2 } from './data';
 // add stealth plugin and use defaults (all evasion techniques)
 puppeteer.use(StealthPlugin());
 
@@ -23,7 +23,7 @@ puppeteer.use(StealthPlugin());
     timeout: 9999999,
     monitor: true,
     puppeteerOptions: {
-      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+      executablePath: 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
       headless: false,
     },
   });
@@ -34,7 +34,10 @@ puppeteer.use(StealthPlugin());
     const title = await page.$eval('.PDF_title', (d) => d.textContent || '');
     const info = await page.$eval('.dftable', (d) => d.textContent || '');
     const content = await page.$eval('.PDF_pox', (d) => d.textContent || '');
-    await writeCsv('./data/test.csv', [
+    if(!content){
+      throw Error('无数据')
+    }
+    await writeCsv('./data/test2.csv', [
       {
         title: title.replace(/[\r\n]/g, ' '),
         info: info.replace(/[\r\n]/g, ' '),
@@ -52,14 +55,14 @@ puppeteer.use(StealthPlugin());
       const fr = frames.find((f) => f._name === 'contentIframe');
       if (fr) {
         const inp = await fr.$('[name="username"]');
-        await inp?.type('13979216200');
+        await inp?.type('15679233619');
         // await inp?.$eval?.('input', d => d.value = '')
         const inp2 = await fr.$('[name="password"]');
         await inp2?.type('jxlgdx6221SJQ');
         const btn = await fr.$('.login-button-container span');
         await btn?.click?.();
         await delay(4000);
-        return true
+        return true;
       } else {
         index += 1;
         await page.reload();
@@ -67,14 +70,14 @@ puppeteer.use(StealthPlugin());
       }
     }
     await page.waitForTimeout(4000);
-    return false
+    return false;
   });
   console.log(res, 'res');
-  if(!res){
+  if (!res) {
     console.log('no login');
-    return
+    return;
   }
-  for (const url of url1.map((u) => 'https://wenshu.court.gov.cn/website/wenshu' + u.slice(2))) {
+  for (const url of url2.map((u) => 'https://wenshu.court.gov.cn/website/wenshu' + u.slice(2))) {
     cluster.queue({ url });
   }
   // many more pages
