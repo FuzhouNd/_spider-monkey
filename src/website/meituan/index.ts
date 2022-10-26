@@ -118,8 +118,7 @@ puppeteer.use(StealthPlugin());
     console.log(tt);
     R.range(2, tt.max + 1).forEach((index) => {
       const taskData = { url: tt.url + '/p' + index, url2: tt.url + '/p' + index };
-      // console.log(taskData);
-      // cluster.queue()
+      cluster.queue(taskData)
     });
     // console.log(dataList);
   });
